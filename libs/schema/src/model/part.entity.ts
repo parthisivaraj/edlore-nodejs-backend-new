@@ -34,6 +34,9 @@ export class Part extends BaseEntity {
   @Column({ nullable: false })
   quantity: number;
 
+  @Column('jsonb', { nullable: true })
+  dynamic_fields: any;
+
   @ManyToOne(() => Anaglyph, (anaglyph) => anaglyph.parts)
   @JoinColumn({ name: 'anaglyph_id' })
   anaglyph: Anaglyph;

@@ -162,6 +162,7 @@ export class AnaglyphService {
       part_name: part.part_name,
       purchase_url: part.purchase_url,
       quantity: part.quantity,
+      dynamic_fields: part.dynamic_fields,
     };
     return temp;
   }
@@ -1077,6 +1078,7 @@ export class AnaglyphService {
                 existingPart.quantity = record['quantity']
                   ? Number(record['quantity'])
                   : 0;
+                existingPart.dynamic_fields = record['dynamic_fields'];
 
                 await queryRunner.manager.save(existingPart);
               } else {
@@ -1091,6 +1093,7 @@ export class AnaglyphService {
                   manufacturer_code: record['mfr_code'],
                   quantity: record['quantity'] ? Number(record['quantity']) : 0,
                   anaglyph: anaglyph,
+                  dynamic_fields: record['dynamic_fields'],
                 });
 
                 await queryRunner.manager.save(part);
