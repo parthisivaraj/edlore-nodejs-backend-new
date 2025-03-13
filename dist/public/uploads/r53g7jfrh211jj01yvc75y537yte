@@ -1,0 +1,10 @@
+layer_id*,part_name*,part_id*,part_description,purchase_url
+AdditionalComponents,Additional Components,1,Additional Components,
+Bolts,Bolts,2,Bolts,
+brake,Brake,3,Brake,
+Jack,Jack,4,Jack,
+LugNuts,Lug Nuts,5,Lug Nuts,
+Shocks,Shocks,6,Shocks,
+Strut,Strut,7,Strut,
+Tire,Tire,8,Tire,
+Wheel,Wheel,9,Wheel,

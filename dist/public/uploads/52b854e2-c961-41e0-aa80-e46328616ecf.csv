@@ -1,0 +1,20 @@
+layer_id*,part_name*,part_id*,part_description,purchase_url,nomenclature,mfr_code,nsn_number,quantity
+1_O_Ring_,O-Ring,1,M83248/1-019 (VITON),,,M83248/1-019,9Z5330-00-166-0996,2
+02_Swivel Nut Elbow,Swivel Nut Elbow,2,12-C6BU-SS (Parker-Hanniﬁn),,,12C6BU-SS,,1
+3_Check_valve,Check Valve,3,417-1255-5,,,417-12SS-5,9C4820-00-903-1126,1
+4_O_Ring_,O-Ring,4,M83248/2-912 (VITON),,,M83248/2-912,9Z5330-00-167-5175,1
+5_Male Connector (Tube to Straight Thread) _,Male Connector (Tube to Straight Thread),5,H859-12-12-SS (CPV),,,,,1
+6_Hex_Head_Cap_Screw_,Hex Head Cap Screw,6,"316 SST, 1/2 - 13 UNC x 3/4″ L.",,,,,2
+7_Tube_Cap_001,Tube Cap,7,12-FNU-SS (Parker-Hanniﬁn),,,12FNU-SS,,1
+8_Socket_Head_Cap_Screw_,Socket Head Cap Screw,8,"Gr. 8, 5/8 - 11 UNC x 9-1/4″ L.",,,,,3
+9_Hex_Head_Cap_Screw_,Hex Head Cap Screw,9,"Gr. 8, 5/8 - 11 UNC x 10″ L.",,,,,9
+10_O_Ring_,O-Ring,10,M83248/1-242 (VITON),,,M83248/1-242,9Z5330-00-165-1960,2
+11_O_Ring_,O-Ring,11,M83248/1-226 (VITON),,,,,4
+12_O_Ring_,O-Ring,12,M83248/1-120 (VITON),,,,,2
+13_O_Ring_002,O-Ring,13,M83248/1-112 (VITON),,,,,1
+14_O_Ring_001,O-Ring,14,M83248/1-114 (VITON),,,,,1
+15_O_Ring_001,O-Ring,15,M83248/1-110 (VITON),,,,,1
+Gen2one,Port Block (Main Pump),53,Port Block (Main Pump),,,,,1
+genone_Default,Port Block (Main Motor),29,Port Block (Main Motor),,,,,1
+Manifold_Block,Manifold Block,Manifold Block,Manifold Block,,,037-72323-D,9C4320-01-151-3516,1
+Outlet_Line,Outlet Line,Outlet Line,Outlet Line,,,,,

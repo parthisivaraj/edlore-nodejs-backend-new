@@ -1,0 +1,30 @@
+layer_id*,part_name*,part_id*,part_description,purchase_url,nomenclature,mfr_code,nsn_number,quantity
+01_Air Bleed Valve,Air Bleed Valve,1,Air Bleed Valve,,,SS-4P-4M,9C4820-01-150-1983,2
+02_Air Bleed Valve,Air Bleed Valve,1,Air Bleed Valve,,,SS-4P-4M,9C4820-01-150-1983,2
+01_Drain Cap,Drain Cap,2,Drain Cap,,,, 7H3040-01-234-0194,2
+02_Drain Cap,Drain Cap,2,Drain Cap,,,,7H3040-01-234-0194,2
+01_Hex Head Cap Screw,Hex Head Cap Screw,3,"316 SST, 3/8 - 16 UNC x 3/4″ L.",,,,,36
+02_Hex Head Cap Screw,Hex Head Cap Screw,3,"316 SST, 3/8 - 16 UNC x 3/4″ L.",,,,,34
+01_Cover Plate,Cover Plate,4,Cover Plate,,,,,3
+02_Cover Plate,Cover Plate,4,Cover Plate,,,,,3
+03_Cover Plate,Cover Plate,4,Cover Plate,,,,,3
+01_O-Ring,O-Ring,5,M83248/1-274 (VITON),,,,,
+02_O-Ring,O-Ring,5,M83248/1-274 (VITON),,,,,
+03_O-Ring,O-Ring,5,M83248/1-274 (VITON),,,M83248/1-274,,3
+Male Elbow,Male Elbow,6,"Tube to Straight Thread, H823-20-20-SS (CPV)",,,,,1
+07_O-Ring,O-Ring,7,M83248/2-920 (VITON),,,M83248/2-920,9Z5330-01-024-2512,3
+Male Connector,Male Connector,8,"Tube to Straight Thread, H823-20-20-SS (CPV)",,,,,1
+09_O-Ring,O-Ring,9,M83248/2-908 (VITON),,,,9Z5330-00-167-5173,1
+10_Male Connector,Male Connector,10,"Tube to Straight Thread, H859-20-20-SS (CPV)",,,,,2
+Gauge Well,Gauge Well,11,Gauge Well,,,,,1
+Thermometer,Thermometer,12,Thermometer,,,,,1
+Relief Valve,Relief Valve,13,Relief Valve,,,,9C4820-00-455-1097,1
+14_O-Ring,O-Ring,14,M83248/2-916 (VITON),,,,,1
+01_Electrical Connector,Electrical Connector,18,Electrical Connector,,,,,1
+02_Electrical Connector,Electrical Connector,18,Electrical Connector,,,,,1
+03_Electrical Connector,Electrical Connector,18,Electrical Connector,,,,,1
+21_Male Connector,Male Connector,21,"Tube to Straight Thread, H859-12-16 (CPV)",,,,,1
+22_O-Ring,O-Ring,22,M83248/1-916 (VITON),,,,,1
+23_O-Ring,O-Ring,23,M83248/1-022 (VITON),,,,,1
+Emergency Check Valve,Emergency Check Valve,24,Emergency Check Valve,,,,,1
+25_O-Ring,O-Ring,25,M83248/1-024 (VITON),,,M83248/1-024,,1

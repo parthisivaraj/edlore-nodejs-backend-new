@@ -1,0 +1,22 @@
+layer_id*,part_name*,part_id*,part_description,purchase_url,nomenclature,mfr_code,nsn_number,quantity
+1_O_Ring_Generic,O-Ring,1,M83248/1-123 (VITON),,,M83248/1-123,9Z5330-00-167-5112,2
+2_Connector,Connector (Male Tube to Male Straight Thread),2,H859-20-20-SS (CPV),,,,,1
+3_O_Ring_Generic,O-Ring,3,M83248/2-920 (VITON),,,M83248/2-920,9Z5330-01-024-7512,1
+4_O_Ring_Generic,O-Ring,4,M83248/1-019 (VITON),,,M83248/1-019,9Z5330-00-166-0996,2
+5_Connector,Connector (Male Tube to Male Straight Thread,5,H859-12-12-SS (CPV),,,,,1
+6_O_Ring_Generic,O-Ring,6,M83248/2-912 (VITON),,,M83248/2-912,9Z5330-00-167-5175,1
+7_Hex_Cap_Head_Screw,Hex Head Cap Screw,7,"1/2-13 UNC x 1-1/4� L., 316 S.ST.",,,,,2
+8_O_Ring_Generic,O-Ring,8,M83248/1-242 (VITON),,,M83248/1-242,9Z5330-00-165-1960,1
+9_Hex_CAP_Head_Screw,Hex Head Cap Screw,9,"1/2-13 UNC x 2-1/4� L., 316 S.ST.",,,,,1
+10_Suction_Block_Connection,Suction Block Connection,10,Suction Block Connection,,,,,2
+11_O_Ring_Generic,O-Ring,11,M83248/1-224 (VITON),,,M83248/1-224,9Z5330-00-166-8427,1
+12_Hex_CAP_Head_Screw,Hex Head Cap Screw,12,"3/8-16 UNC x 1-1/4� L.,316 S.ST.",,,,,4
+13_Pressure_Block_Connection,Pressure Block Connection,13,Pressure Block Connection,,,,,1
+14_O_Ring_Generic,O-Ring,14,M83248/1-217 (VITON),,,M83248/1-217,9Z5330-00-165-1943,2
+15_Hex_CAP_head_Screw,Socket Head Cap Screw,15,"3/8-16 UNC x 1-1/4� L., 316 S.ST",,,,,4
+16_Pressure_Connection_Subplate,Pressure Connection Subplate,16,Pressure Connection Subplate,,,,,1
+17_Straight Thread Plug,Straight Thread Plug,17,4P50N-SS (Parker-Hanni?n),,,,,1
+18_O_Ring_Generic,O-Ring,18,M83248/2-904 (VITON),,,M83248/2-904,9Z5330-00-167-5172,1
+Outlet_Line,Outlet Line,Outlet Line,Outlet Line,,,,,
+Control_System_pump,Control System Pump,Control System Pump,Control System Pump,,,M14-29919,7H4320-01-149-7827,1
+Inlet_Line,Inlet Line,Inlet Line,Inlet Line,,,,,

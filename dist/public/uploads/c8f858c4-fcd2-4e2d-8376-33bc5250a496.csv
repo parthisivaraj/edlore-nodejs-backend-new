@@ -1,0 +1,125 @@
+layer_id*,part_name*,part_id*,part_description,purchase_url,nomenclature,mfr_code,nsn_number,quantity
+Jam Nut1_,Jam Nut,1,1/4-20 UNC,,,,,2
+AsjustingScrew2_,Adjusting Screw,2,Adjusting Screw,,,,,1
+Square Head Adjusting Screw3_,Square Head Adjusting Screw,3,316 SST,,,,,1
+Hex Head Cap Screw4_,Hex Head Cap Screw,4,316 SST,,,,,4
+Brake Switch Cover_,Brake Switch Cover,5,Brake Switch Cover,,,M17-44640,7H3040-01-255-9173,1
+Brake Switch Gasket_,Brake Switch Gasket,6,Brake Switch Gasket,,,037-71933,9Z5330-00-166-8406,1
+Straight Thread Plug7_,Straight Thread Plug,7,6P50N-SS (Parker-Hannifin),,,,,1
+O-Ring8_,O-Ring,8,M83248/2-906 (VITON),,,M83248/2-906,9Z5330-00-853-2379,4
+Spring9_,Spring,9,Spring,,,M112,9Z5360-01-172-6300,1
+Centering Lever_,Centering Lever,10,Centering Lever,,,037-53908,9C3010-01-161-0248,1
+Spring11_,Spring,11,Spring,,,037-53909,9Z5360-01-235-0202,1
+Key12_,Key,12,MS9841-10 (Woodruff No. 3),,,211-10003,9V5315-01-057-6907,1
+Input Shaft_,Input Shaft,13,Input Shaft,,,037-71940,9C4320-01-151-3532,1
+Hex Head Cap Screw14_,Hex Head Cap Screw,14,Gr. 8,,,,,4
+Flat Washer15_,Flat Washer,15,3/8” I.D.,,,,,4
+Statoseal16_,Statoseal,16,3/8” Diameter,,, 600-3130-3/8,9Z533-00-171-7174,4
+Teflon Glyd Ring17_,Teflon Glyd Ring,17,Teflon Glyd Ring,,,,5365-01-153-9164,2
+ORing18_,O-Ring,18,M83248/1-017 (VITON),,,M83248/1-017,9Z5330-00-166-0993,2
+Upper Control Block Pilot_,Upper Control Block Pilot,19,*,,,,,1
+O-Ring20_,O-Ring,20,M83248/1-113 (VITON),,,M83248/1-113, 9Z5330-00-166-1062,7
+O-Ring021_,O-Ring,21,M83248/1-111 (VITON),,,M83248/1-111,9Z5330-00-166-1059,10
+Sleeve and Spool Assembly22_,Sleeve and Spool Assembly,22,Large Stroking Cylinder Relief Valve,,,S16-45166,9C4320-01-178-8744,2
+Spring23_,Spring,23,Spring,,,036-27547,925360-00-790-2424,2
+O-Ring024_,O-Ring,24,VITON,,,026-19359,,2
+O-Ring025_,O-Ring,25,VITON,,, 125-19359,,4
+Pipe plug26_,Pipe Plug,26,1/16 -NPTF,,,,,10
+SpoolSleeveAs_,Spool and Sleeve Assembly,27,Small Stroking Cylinder Relief Valve,,,515-46194,9C4320-01-151-3528,1
+Spring28_,Spring,28,Spring,,,036-38448,925360-01-148-6657,1
+O-Ring29_,O-Ring,29,VITON,,,022-19359,,1
+O-Ring030_,O-Ring,30,VITON,,, 018-19359,,2
+Thrust Washer31_,Thrust Washer,31,Thrust Washer,,,TRA-1018,973110-01-038-70341,6
+Thrust Bearing32_,Thrust Bearing,32,Thrust Bearing,,,NTA-1018,923110-00-629-4112,3
+Spur Gear33_,Spur Gear,33,Spur Gear,,,037-72320,9C4320-01-151-3535,1
+Dowel Pin34_,Dowel Pin,34,5/64” Dia. x 3/4” L.,,,325-35004,,2
+Glyd Ring35_,Glyd Ring,35,Glyd Ring,,,,9C5365-01-153-9165,1
+O-Ring36_,O-Ring,36,M83248/1-124 (VITON),,,M83248/1-124,9Z5330-00-167-5113,1
+Input Spool_,Input Spool,37,Input Spool,,,037-71944,9C4320-01-151-3533,1
+Sleeve_,Sleeve,38,Sleeve,,, 037-71938,9C4320-01-151-3531,1
+O-Ring39_,O-Ring,39,M83248/2-015 (VITON),,,M83248/2-015,,1
+O-Ring040_,O-Ring,40,M83248/1-233 (VITON),,,M83248/1-233, 9Z5330-00-165-1951,1
+O-Ring41_,O-Ring,41,M83248/1-110 (VITON),,,M83248/1-110, 9Z5330-00-166-1058,9
+O-Ring42_,O-Ring,42,M83248/1-118 (VITON),,,M83248/1-118,9Z5330-00-166-1072,2
+Pilot Ring43_,Pilot Ring,43,*,,,,,1
+Trunnion Coupling44_,Trunnion Coupling,44,Trunnion Coupling,,, 037-71952, 9C3010-01-150-5396,1
+Dowel Pin45_,Dowel Pin,45,1/4” Dia. x 1-1/4” L.,,,,,2
+Hex Head Cap Screw46_,Hex Head Cap Screw,46,5/16”- 18 UNC x 3/4” L.,,,,,8
+Bearing Retainer47_,Bearing Retainer,47,Bearing Retainer,,,037-71939,925340-01-150-1094,1
+Oring58_,O-Ring,48,M83248/1-031 (VITON),,,M83248/1-031, 9Z5330-00-166-8391,1
+Needle Bearing49_,Needle Bearing,49,Needle Bearing,,,B-1412,9Z3110-00-975-3586,1
+Inner Race Bearing001_,Inner Race Bearing,50,Inner Race Bearing,,,IR-1012,9Z3110-00-198-2763,1
+Spring Pin51_,Spring Pin,51,3/16” Dia. x 3/4” L.,,,,,1
+Centering Collar_,Centering Collar,52,Centering Collar,,,037-53757, 912030-01-151-4901,1
+DowelPin53_,Dowel Pin,53,1/4” Dia. x 3/4” L.,,,,,2
+Bushing54_,Bushing,54,Bushing,,,, 9Z3110-00-275-0266,2
+Spur Gear_,Spur Gear,55,Spur Gear,,,037-71932,9C3020-01-150-4794,1
+Inner Race Bearing56_,Inner Race Bearing,56,Inner Race Bearing,,,IR-612-1,,1
+NeedleBearing57_,Needle Bearing,57,Needle Bearing,,,B1012,9Z3110-00-151-9393,1
+PipePlug58_,Pipe Plug,58,1/4-NPTF,,,,,8
+Hex Head Cap Screw59_,Hex Head Cap Screw,59,3/8 - 24 UNF x 2-1/4″ L.,,,,,8
+Spacer60_,Spacer,60,Spacer,,,037-71446, 925365-01-157-9869,8
+ORing61_,O-Ring,61,M83248/1-013 (VITON),,,M83248/1-013,9Z5330-00-166-0988,4
+Adjusting Screw62_,Adjustment Screw,62,316 SST,,, 037-71451,925340-01-092-2526,2
+Jam Nut63_,Jam Nut,63,5/16 - 24 UNF,,,,,2
+Adjusting Plug64_,Adjustment Plug,64,Adjustment Plug,,,036-21765,,2
+Seal Piston65_,Seal Piston,65,Seal Piston,,,036-21767,9C4820-00-835-4423,2
+O-Ring66_,O-Ring,66,M83248/1-012 (VITON),,, M83248/1-012, 9Z5330-00-166-0980,2
+Spring67_,Spring,67,In Large Stroking Cylinder Relief Valve Cap,,,036-13245,915360-00-536-6441,1
+Spring68_,Spring,68,In Compensator Relief Valve Cap,,,036-12289,9Z5360-00-664-7385,1
+Cone69_,Cone,69,Cone,,, 036-12288,9C4810-00-457-1744,2
+Set Screw (Socket Head Half Dog)_,Set Screw (Socket Head Half Dog),70,5/8 - 18 UNF x 5/8″ L.,,,,,2
+Spacer71_,Spacer,71,Spacer,,,036-27548, 9Z5340-00-458-7711,2
+Cone Spacer72_,Cone Spacer,72,Cone Spacer,,,036-43794,9Z5365-01-153-9176,2
+Control Seat73_,Control Seat,73,Control Seat,,,036-11692, 9C4820-00-845-5482,2
+Straight Thread Plug74_,Straight Thread Plug,74,4P50N-SS (Parker-Hannifin),,,,,2
+ORing75_,O-Ring,75,M83248/2-904 (VITON),,,M83248/2-904,9Z5330-00-167-5172,2
+Orifice76_,Orifice,76,0.0465″,,, 036-25528,9C4730-00-449-4691,4
+Orifice77_,Orifice,77,0.028″,,,036-19104,9C4730-01-151-3502,1
+Valve Cap78_,Valve Cap,78,Valve Cap,,, 036-47831, 9C4820-01-149-1120,2
+Air Bleed Valve79_,Air Bleed Valve,79,Air Bleed Valve,,,M83248/2-015,9C4820-01-150-1983,1
+Straight Thread Plug003_,Straight Thread Plug,80,8P50N-SS (Parker-Hannifin),,,,,4
+O-Ring019_,O-Ring,81,M83248/2-908 (VITON),,,M83248/2-908,9Z5330-00-167-5173,4
+Check Valve Seat Nut003_,Check Valve Seat Nut,82,Check Valve Seat Nut,,,037-72527,9C4820-01-149-5853,5
+Seat001_,Seat,83,Seat,,,037-72528,9Z5365-01-153-9177,5
+Poppet001_,Poppet,84,Poppet,,,035-49407,9C4310-00-304-3692,5
+Spring004_,Spring,85,Spring,,,035-49438,9Z5360-00-304-8959,4
+Spring Guide001_,Spring Guide,86,Spring Guide,,,035-49439,9C4320-00-304-3698,5
+Hex Head Cap Screw87_,Hex Head Cap Screw,87,3/8 - 16 UNC x 1″ L.,,,,,6
+ControlCover88_,Control Cover,88,Control Cover,,,,,1
+Control Cover Gasket_,Control Cover Gasket,89,Control Cover Gasket,,, 037-71933,9Z5330-01-148-6712,1
+Mechanical Centering Piston_,Mechanical Centering Piston,90,Mechanical Centering Piston,,,037-53907,9C4320-01-163-0962,1
+Oilite Bushing91_,Oilite Bushing,91,Oilite Bushing,,,,,1
+Maximum Volume Stop Plug92_,Maximum Volume Stop Plug,92,Maximum Volume Stop Plug,,,037-72106,9Z5340-01-149-7180,1
+Spring93_,Spring,93,Spring,,,037-53939,9Z5360-01-234-0272,1
+Stuffing Tube_,Stuffing Tube,94,Stuffing Tube,,,M24235/13-002,9G5975-00-178-0591,1
+Puller Elbow_,Puller Elbow,95,Puller Elbow,,,AY50,9C4730-01-211-8528,1
+Hex Head Cap Screw96_,Hex Head Cap Screw,96,1/4 - 20 UNC x 5/8″ L.,,,,,2
+BrakeSwitchGasket_,Brake Switch Bracket,97,Brake Switch Bracket,,,037-72251,9Z5340-01-236-1846,1
+Round Head Screw (Nylok)_,Round Head Screw (Nylok),98,6 - 32 UNC x 1″ L.,,,,,2
+Lockwasher99_,Lockwasher,99,No. 6,,,,,1
+Hex Nut (Nylok)_,Hex Nut (Nylok),100,Hex Nut (Nylok),,,,,1
+Micro Switch_,Micro Switch,101,Micro Switch,,,BZ-2RDS,,1
+Terminal Case_,Terminal Case,102,Terminal Case,,,,,1
+Protection Plate103_,Protection Plate,103,Protection Plate,,,,,1
+Data Plate_,Data Plate,104,Data Plate,,,,,1
+Drive Screw_,Drive Screw,105,Drive Screw,,,,,5
+UpperControlBlock_,Upper Control Block,106,No. 4 x 3/8″,,,,,10
+HexScrew107_,Hex Head Cap Screw,107,Hex Head Cap Screw,,,,,1
+Failsafe Spool_,Failsafe Spool,108,3/8 - 16 UNC,,,037-71954,9C4320-01-151-3534,1
+Orifice109_,Orifice,109,0.018″,,, 037-71959, 9C4730-01-151-3503,1
+Spring110_,Spring,110,Spring,,,M-100A,9Z5360-01-160-1780,1
+Straight Thread Plug111_,Straight Thread Plug,111,6EP50N-SS (Parker-Hannifin),,,,,1
+PipePlug112_,Pipe Plug,112,1/8 - NPTF,,,,,8
+Male Tube Elbow_,Male Tube Elbow,113,H823-8-8-SS (CPV),,,,,1
+Failsafe Body114_,Failsafe Body,114,Failsafe Body,,,,,1
+Spring115_,Spring,115,Spring,,,037-71967, 9Z5360-148-6658,1
+Hex Nut_,Hex Nut,119,1/2 - 20,,,,,1
+Statoseal_,Statoseal,120,1/2″ Diameter,,,,,1
+Hex Head Cap Screw121_,Hex Head Cap Screw,121,1/4 - 20 UNC x 5/8″ L.,,,,,3
+Solenoid Valve_,Solenoid Valve,122,Solenoid Valve,,,V10L225012060,,1
+SpringPin123_,Spring Pin,123,1/8″ Dia. x 5/16″,,,,,2
+O-Ring0124_,O-Ring,124,M83248/1-008 (VITON),,,,,2
+DowelPin127_,Dowel Pin,127,1/4″ Dia. x 1/2″ L.,,,,,1
+Lower Control Block_,Lower Control Block,128,Lower Control Block,,,,,1
+Dowel Pin129_,Dowel Pin,129,1/4″ Dia. x 1″ L.,,,,,1
