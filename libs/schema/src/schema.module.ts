@@ -45,6 +45,7 @@ import {
   RealiseNoteEntity,
   Database,
   PartNotes,
+  PartFields,
 } from './model';
 import { CustomUniqueValidator } from './validator';
 import { ModelSubscriber } from './subscriber';
@@ -103,6 +104,7 @@ export const DBSchemas = {
   realiseNote: TypeOrmModule.forFeature([RealiseNoteEntity]),
   database: TypeOrmModule.forFeature([Database]),
   partNotes: TypeOrmModule.forFeature([PartNotes]),
+  partFields: TypeOrmModule.forFeature([PartFields]),
 };
 
 @Global()
@@ -168,6 +170,7 @@ export const DBSchemas = {
           RealiseNoteEntity,
           Database,
           PartNotes,
+          PartFields,
         ],
       }),
     }),

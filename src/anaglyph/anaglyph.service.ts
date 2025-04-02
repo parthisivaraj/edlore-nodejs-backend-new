@@ -16,6 +16,7 @@ import {
   Note,
   Part,
   PartNotes,
+  PartFields,
 } from '@app/schema';
 import * as fs from 'fs';
 import * as csv from 'csv-parser';
@@ -29,6 +30,8 @@ import {
   PartResposeDTO,
   PartDTO,
   PartDetailsResposeDTO,
+  PartFieldsDTO,
+  PartFieldsResponseDTO,
 } from './dto/anaglyph';
 import { MediaService } from 'src/media/media.service';
 import {
@@ -58,6 +61,9 @@ export class AnaglyphService {
 
     @InjectRepository(AttachedMedia)
     private readonly attachedMediaRepository: Repository<AttachedMedia>,
+
+    @InjectRepository(PartFields)
+    private readonly partFieldsRepository: Repository<PartFields>,
 
     private dataSource: DataSource,
     private mediaService: MediaService,
@@ -142,6 +148,14 @@ export class AnaglyphService {
     }
 
     return response;
+  }
+
+  private async convertToPartFieldsDTO(partField: PartFields): Promise<PartFieldsDTO> {
+    const temp = {
+      id: partField.id,
+      name: partField.name
+    };
+    return temp;
   }
 
   private async convertToPartDTO(part: Part): Promise<PartDTO> {
@@ -318,6 +332,18 @@ export class AnaglyphService {
     };
   }
 
+  async getBynew(): Promise<PartFieldsResponseDTO> {
+    const part_fields = await this.partFieldsRepository
+      .createQueryBuilder('part_fields')
+
+    return {
+      part_fields: await Promise.all(
+        part_fields.map((partField: PartFields) => this.convertToPartFieldsDTO(partField)),
+      ),
+      message: 'Success',
+    };
+  }
+  
   async create(modelId: string, data: AddEditRequestDTO) {
     const model = await this.modelRepository.findOne({
       where: { id: modelId },

@@ -101,3 +101,13 @@ export interface PartDetailsResposeDTO {
   part: PartDTO;
   message: string;
 }
+
+export class PartFieldsDTO {
+  id: string;
+  name: string;
+}
+
+export class PartFieldsResponseDTO {
+  part_fields: string;
+  message: string;
+}

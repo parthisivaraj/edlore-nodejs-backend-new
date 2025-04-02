@@ -44,3 +44,4 @@ export * from './realise-note.entity';
 export * from './database.entity';
 export * from './media.entity';
 export * from './part-notes.entity';
+export * from './part-fields.entity';
