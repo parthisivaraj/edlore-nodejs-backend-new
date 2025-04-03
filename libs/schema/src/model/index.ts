@@ -45,3 +45,4 @@ export * from './database.entity';
 export * from './media.entity';
 export * from './part-notes.entity';
 export * from './part-fields.entity';
+export * from './part-fields-mappings.entity';

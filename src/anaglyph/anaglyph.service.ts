@@ -331,18 +331,6 @@ export class AnaglyphService {
       message: 'Success',
     };
   }
-
-  async getBynew(): Promise<PartFieldsResponseDTO> {
-    const part_fields = await this.partFieldsRepository
-      .createQueryBuilder('part_fields')
-
-    return {
-      part_fields: await Promise.all(
-        part_fields.map((partField: PartFields) => this.convertToPartFieldsDTO(partField)),
-      ),
-      message: 'Success',
-    };
-  }
   
   async create(modelId: string, data: AddEditRequestDTO) {
     const model = await this.modelRepository.findOne({

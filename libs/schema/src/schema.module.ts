@@ -46,6 +46,7 @@ import {
   Database,
   PartNotes,
   PartFields,
+  PartFieldsMappings,
 } from './model';
 import { CustomUniqueValidator } from './validator';
 import { ModelSubscriber } from './subscriber';
@@ -105,6 +106,7 @@ export const DBSchemas = {
   database: TypeOrmModule.forFeature([Database]),
   partNotes: TypeOrmModule.forFeature([PartNotes]),
   partFields: TypeOrmModule.forFeature([PartFields]),
+  partFieldsMappings: TypeOrmModule.forFeature([PartFieldsMappings]),
 };
 
 @Global()
@@ -171,6 +173,7 @@ export const DBSchemas = {
           Database,
           PartNotes,
           PartFields,
+          PartFieldsMappings,
         ],
       }),
     }),

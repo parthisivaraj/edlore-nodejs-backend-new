@@ -22,8 +22,8 @@ export class PartFieldsService {
   }
 
   async get(): Promise<any> {
-    const partFieldss = await this.partFieldsRepository.find();
-    const data = partFieldss.map((machine) => this.convertToDTO(machine));
+    const partFields = await this.partFieldsRepository.find();
+    const data = partFields.map((partfield) => this.convertToDTO(partfield));
     return { data };
   }
 

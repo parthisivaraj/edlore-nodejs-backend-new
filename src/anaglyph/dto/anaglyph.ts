@@ -108,6 +108,6 @@ export class PartFieldsDTO {
 }
 
 export class PartFieldsResponseDTO {
-  part_fields: string;
+  part_fields: PartFieldsDTO[];
   message: string;
 }

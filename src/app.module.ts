@@ -42,6 +42,7 @@ import { StepModule } from './step';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './response-interceptor.service';
 import { PartFieldsModule } from './part-fields';
+import { PartFieldsMappingsModule } from './part-fields-mappings';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -92,6 +93,7 @@ import { PartFieldsModule } from './part-fields';
     StepModule,
     RealiseNoteModule,
     PartFieldsModule,
+    PartFieldsMappingsModule,
   ],
   controllers: [],
   providers: [

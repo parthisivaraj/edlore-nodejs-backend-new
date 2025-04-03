@@ -13,6 +13,7 @@ import { MediaModule } from 'src/media';
     DBSchemas.note,
     DBSchemas.partNotes,
     DBSchemas.attachedMedia,
+    DBSchemas.partFields,
     MediaModule,
   ],
   providers: [AnaglyphService],
