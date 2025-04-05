@@ -526,11 +526,11 @@ export class MediaService {
         }
       }
 
-      await new Promise((resolve, reject) => {
-        finalFile.on('finish', resolve);
-        finalFile.on('error', reject);
-        finalFile.end();
-      });
+      await new Promise<void>((resolve, reject) => {
+  finalFile.once('finish', () => resolve());         // ✅ wrapped
+  finalFile.once('error', (err) => reject(err));     // ✅ handle error
+  finalFile.end();
+});
 
       if (!fs.existsSync(tmpFilePath)) {
         throw new Error(

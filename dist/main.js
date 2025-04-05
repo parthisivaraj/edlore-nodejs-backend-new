@@ -1792,6 +1792,8 @@ __exportStar(__webpack_require__(/*! ./realise-note.entity */ "./libs/schema/src
 __exportStar(__webpack_require__(/*! ./database.entity */ "./libs/schema/src/model/database.entity.ts"), exports);
 __exportStar(__webpack_require__(/*! ./media.entity */ "./libs/schema/src/model/media.entity.ts"), exports);
 __exportStar(__webpack_require__(/*! ./part-notes.entity */ "./libs/schema/src/model/part-notes.entity.ts"), exports);
+__exportStar(__webpack_require__(/*! ./part-fields.entity */ "./libs/schema/src/model/part-fields.entity.ts"), exports);
+__exportStar(__webpack_require__(/*! ./part-fields-mappings.entity */ "./libs/schema/src/model/part-fields-mappings.entity.ts"), exports);
 
 
 /***/ }),
@@ -2291,6 +2293,82 @@ exports.OTP = OTP = __decorate([
 
 /***/ }),
 
+/***/ "./libs/schema/src/model/part-fields-mappings.entity.ts":
+/*!**************************************************************!*\
+  !*** ./libs/schema/src/model/part-fields-mappings.entity.ts ***!
+  \**************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsMappings = void 0;
+const typeorm_1 = __webpack_require__(/*! typeorm */ "typeorm");
+const base_entity_1 = __webpack_require__(/*! ./base.entity */ "./libs/schema/src/model/base.entity.ts");
+let PartFieldsMappings = class PartFieldsMappings extends base_entity_1.BaseEntityWithoutDelete {
+};
+exports.PartFieldsMappings = PartFieldsMappings;
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], PartFieldsMappings.prototype, "part_id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], PartFieldsMappings.prototype, "part_field_id", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar'),
+    __metadata("design:type", String)
+], PartFieldsMappings.prototype, "value", void 0);
+exports.PartFieldsMappings = PartFieldsMappings = __decorate([
+    (0, typeorm_1.Entity)('part_fields_mappings')
+], PartFieldsMappings);
+
+
+/***/ }),
+
+/***/ "./libs/schema/src/model/part-fields.entity.ts":
+/*!*****************************************************!*\
+  !*** ./libs/schema/src/model/part-fields.entity.ts ***!
+  \*****************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFields = void 0;
+const typeorm_1 = __webpack_require__(/*! typeorm */ "typeorm");
+const base_entity_1 = __webpack_require__(/*! ./base.entity */ "./libs/schema/src/model/base.entity.ts");
+let PartFields = class PartFields extends base_entity_1.BaseEntityWithoutDelete {
+};
+exports.PartFields = PartFields;
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 255 }),
+    __metadata("design:type", String)
+], PartFields.prototype, "name", void 0);
+exports.PartFields = PartFields = __decorate([
+    (0, typeorm_1.Entity)('part_fields')
+], PartFields);
+
+
+/***/ }),
+
 /***/ "./libs/schema/src/model/part-notes.entity.ts":
 /*!****************************************************!*\
   !*** ./libs/schema/src/model/part-notes.entity.ts ***!
@@ -2406,6 +2484,14 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", Number)
 ], Part.prototype, "quantity", void 0);
+__decorate([
+    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    __metadata("design:type", Object)
+], Part.prototype, "dynamic_fields", void 0);
+__decorate([
+    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    __metadata("design:type", Object)
+], Part.prototype, "part_fields", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => anaglyph_entity_1.Anaglyph, (anaglyph) => anaglyph.parts),
     (0, typeorm_1.JoinColumn)({ name: 'anaglyph_id' }),
@@ -4056,6 +4142,8 @@ exports.DBSchemas = {
     realiseNote: typeorm_1.TypeOrmModule.forFeature([model_1.RealiseNoteEntity]),
     database: typeorm_1.TypeOrmModule.forFeature([model_1.Database]),
     partNotes: typeorm_1.TypeOrmModule.forFeature([model_1.PartNotes]),
+    partFields: typeorm_1.TypeOrmModule.forFeature([model_1.PartFields]),
+    partFieldsMappings: typeorm_1.TypeOrmModule.forFeature([model_1.PartFieldsMappings]),
 };
 let SchemaModule = class SchemaModule {
 };
@@ -4124,6 +4212,8 @@ exports.SchemaModule = SchemaModule = __decorate([
                         model_1.RealiseNoteEntity,
                         model_1.Database,
                         model_1.PartNotes,
+                        model_1.PartFields,
+                        model_1.PartFieldsMappings,
                     ],
                 }),
             }),
@@ -5131,6 +5221,7 @@ exports.AnaglyphModule = AnaglyphModule = __decorate([
             schema_1.DBSchemas.note,
             schema_1.DBSchemas.partNotes,
             schema_1.DBSchemas.attachedMedia,
+            schema_1.DBSchemas.partFields,
             media_1.MediaModule,
         ],
         providers: [anaglyph_service_1.AnaglyphService],
@@ -5161,7 +5252,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AnaglyphService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -5175,13 +5266,14 @@ const anaglyph_1 = __webpack_require__(/*! ./dto/anaglyph */ "./src/anaglyph/dto
 const media_service_1 = __webpack_require__(/*! src/media/media.service */ "./src/media/media.service.ts");
 const service_1 = __webpack_require__(/*! @app/schema/service */ "./libs/schema/src/service/index.ts");
 let AnaglyphService = class AnaglyphService {
-    constructor(anaglyphRepository, partRepository, partNotesRepository, noteRepository, modelRepository, attachedMediaRepository, dataSource, mediaService, customUniqueService, commonStepService) {
+    constructor(anaglyphRepository, partRepository, partNotesRepository, noteRepository, modelRepository, attachedMediaRepository, partFieldsRepository, dataSource, mediaService, customUniqueService, commonStepService) {
         this.anaglyphRepository = anaglyphRepository;
         this.partRepository = partRepository;
         this.partNotesRepository = partNotesRepository;
         this.noteRepository = noteRepository;
         this.modelRepository = modelRepository;
         this.attachedMediaRepository = attachedMediaRepository;
+        this.partFieldsRepository = partFieldsRepository;
         this.dataSource = dataSource;
         this.mediaService = mediaService;
         this.customUniqueService = customUniqueService;
@@ -5249,6 +5341,13 @@ let AnaglyphService = class AnaglyphService {
         }
         return response;
     }
+    async convertToPartFieldsDTO(partField) {
+        const temp = {
+            id: partField.id,
+            name: partField.name
+        };
+        return temp;
+    }
     async convertToPartDTO(part) {
         const temp = {
             id: part.id,
@@ -5265,6 +5364,8 @@ let AnaglyphService = class AnaglyphService {
             part_name: part.part_name,
             purchase_url: part.purchase_url,
             quantity: part.quantity,
+            dynamic_fields: part.dynamic_fields,
+            part_fields: part.part_fields,
         };
         return temp;
     }
@@ -5928,6 +6029,8 @@ let AnaglyphService = class AnaglyphService {
                             existingPart.quantity = record['quantity']
                                 ? Number(record['quantity'])
                                 : 0;
+                            existingPart.dynamic_fields = record['dynamic_fields'];
+                            existingPart.part_fields = record['part_fields'];
                             await queryRunner.manager.save(existingPart);
                         }
                         else {
@@ -5942,6 +6045,8 @@ let AnaglyphService = class AnaglyphService {
                                 manufacturer_code: record['mfr_code'],
                                 quantity: record['quantity'] ? Number(record['quantity']) : 0,
                                 anaglyph: anaglyph,
+                                dynamic_fields: record['dynamic_fields'],
+                                part_fields: record['part_fields'],
                             });
                             await queryRunner.manager.save(part);
                         }
@@ -5973,7 +6078,8 @@ exports.AnaglyphService = AnaglyphService = __decorate([
     __param(3, (0, typeorm_1.InjectRepository)(schema_1.Note)),
     __param(4, (0, typeorm_1.InjectRepository)(schema_1.Model)),
     __param(5, (0, typeorm_1.InjectRepository)(schema_1.AttachedMedia)),
-    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _c : Object, typeof (_d = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _d : Object, typeof (_e = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _e : Object, typeof (_f = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _f : Object, typeof (_g = typeof typeorm_2.DataSource !== "undefined" && typeorm_2.DataSource) === "function" ? _g : Object, typeof (_h = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _h : Object, typeof (_j = typeof service_1.CustomUniqueService !== "undefined" && service_1.CustomUniqueService) === "function" ? _j : Object, typeof (_k = typeof service_1.CommonStepService !== "undefined" && service_1.CommonStepService) === "function" ? _k : Object])
+    __param(6, (0, typeorm_1.InjectRepository)(schema_1.PartFields)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _c : Object, typeof (_d = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _d : Object, typeof (_e = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _e : Object, typeof (_f = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _f : Object, typeof (_g = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _g : Object, typeof (_h = typeof typeorm_2.DataSource !== "undefined" && typeorm_2.DataSource) === "function" ? _h : Object, typeof (_j = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _j : Object, typeof (_k = typeof service_1.CustomUniqueService !== "undefined" && service_1.CustomUniqueService) === "function" ? _k : Object, typeof (_l = typeof service_1.CommonStepService !== "undefined" && service_1.CommonStepService) === "function" ? _l : Object])
 ], AnaglyphService);
 
 
@@ -6119,7 +6225,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PartDTO = exports.AnaglyphDetailDTO = exports.AnaglyphDetailResponseDTO = exports.AnaglyphResponse = exports.AnaglyphResponseDto = exports.ThumbUrlDisplayDto = exports.SectionDto = void 0;
+exports.PartFieldsResponseDTO = exports.PartFieldsDTO = exports.PartDTO = exports.AnaglyphDetailDTO = exports.AnaglyphDetailResponseDTO = exports.AnaglyphResponse = exports.AnaglyphResponseDto = exports.ThumbUrlDisplayDto = exports.SectionDto = void 0;
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class SectionDto {
 }
@@ -6198,6 +6304,12 @@ exports.AnaglyphDetailDTO = AnaglyphDetailDTO;
 class PartDTO {
 }
 exports.PartDTO = PartDTO;
+class PartFieldsDTO {
+}
+exports.PartFieldsDTO = PartFieldsDTO;
+class PartFieldsResponseDTO {
+}
+exports.PartFieldsResponseDTO = PartFieldsResponseDTO;
 
 
 /***/ }),
@@ -6287,6 +6399,8 @@ const permission_module_1 = __webpack_require__(/*! ./permission/permission.modu
 const step_1 = __webpack_require__(/*! ./step */ "./src/step/index.ts");
 const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
 const response_interceptor_service_1 = __webpack_require__(/*! ./response-interceptor.service */ "./src/response-interceptor.service.ts");
+const part_fields_1 = __webpack_require__(/*! ./part-fields */ "./src/part-fields/index.ts");
+const part_fields_mappings_1 = __webpack_require__(/*! ./part-fields-mappings */ "./src/part-fields-mappings/index.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -6339,6 +6453,8 @@ exports.AppModule = AppModule = __decorate([
             sync_module_1.SyncModule,
             step_1.StepModule,
             realise_note_1.RealiseNoteModule,
+            part_fields_1.PartFieldsModule,
+            part_fields_mappings_1.PartFieldsMappingsModule,
         ],
         controllers: [],
         providers: [
@@ -13746,8 +13862,8 @@ let MediaService = class MediaService {
                 }
             }
             await new Promise((resolve, reject) => {
-                finalFile.on('finish', resolve);
-                finalFile.on('error', reject);
+                finalFile.once('finish', () => resolve());
+                finalFile.once('error', (err) => reject(err));
                 finalFile.end();
             });
             if (!fs.existsSync(tmpFilePath)) {
@@ -15305,6 +15421,601 @@ exports.OrganizationService = OrganizationService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [typeof (_a = typeof config_1.AppConfigService !== "undefined" && config_1.AppConfigService) === "function" ? _a : Object])
 ], OrganizationService);
+
+
+/***/ }),
+
+/***/ "./src/part-fields-mappings/dto/add-edit.ts":
+/*!**************************************************!*\
+  !*** ./src/part-fields-mappings/dto/add-edit.ts ***!
+  \**************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateUpdatePartFieldsMappingsDTO = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateUpdatePartFieldsMappingsDTO {
+}
+exports.CreateUpdatePartFieldsMappingsDTO = CreateUpdatePartFieldsMappingsDTO;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUpdatePartFieldsMappingsDTO.prototype, "part_field_id", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUpdatePartFieldsMappingsDTO.prototype, "part_id", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUpdatePartFieldsMappingsDTO.prototype, "value", void 0);
+
+
+/***/ }),
+
+/***/ "./src/part-fields-mappings/dto/part-fields-mappings.ts":
+/*!**************************************************************!*\
+  !*** ./src/part-fields-mappings/dto/part-fields-mappings.ts ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsMappingsDTO = void 0;
+class PartFieldsMappingsDTO {
+}
+exports.PartFieldsMappingsDTO = PartFieldsMappingsDTO;
+
+
+/***/ }),
+
+/***/ "./src/part-fields-mappings/index.ts":
+/*!*******************************************!*\
+  !*** ./src/part-fields-mappings/index.ts ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__webpack_require__(/*! ./part-fields-mappings.module */ "./src/part-fields-mappings/part-fields-mappings.module.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/part-fields-mappings/part-fields-mappings.controller.ts":
+/*!*********************************************************************!*\
+  !*** ./src/part-fields-mappings/part-fields-mappings.controller.ts ***!
+  \*********************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsMappingsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const part_fields_mappings_service_1 = __webpack_require__(/*! ./part-fields-mappings.service */ "./src/part-fields-mappings/part-fields-mappings.service.ts");
+const add_edit_1 = __webpack_require__(/*! ./dto/add-edit */ "./src/part-fields-mappings/dto/add-edit.ts");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+let PartFieldsMappingsController = class PartFieldsMappingsController {
+    constructor(partFieldsMappingsService) {
+        this.partFieldsMappingsService = partFieldsMappingsService;
+    }
+    async getByPartId(part_id) {
+        return this.partFieldsMappingsService.getByPartId(part_id);
+    }
+    async create(createPartFieldsMappingsDto) {
+        return this.partFieldsMappingsService.create(createPartFieldsMappingsDto);
+    }
+};
+exports.PartFieldsMappingsController = PartFieldsMappingsController;
+__decorate([
+    (0, common_1.Get)(':part_id'),
+    __param(0, (0, common_1.Param)('part_id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+], PartFieldsMappingsController.prototype, "getByPartId", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof add_edit_1.CreateUpdatePartFieldsMappingsDTO !== "undefined" && add_edit_1.CreateUpdatePartFieldsMappingsDTO) === "function" ? _c : Object]),
+    __metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+], PartFieldsMappingsController.prototype, "create", null);
+exports.PartFieldsMappingsController = PartFieldsMappingsController = __decorate([
+    (0, common_1.Controller)('part_fields_mappings'),
+    (0, swagger_1.ApiTags)('part_fields_mappings'),
+    __metadata("design:paramtypes", [typeof (_a = typeof part_fields_mappings_service_1.PartFieldsMappingsService !== "undefined" && part_fields_mappings_service_1.PartFieldsMappingsService) === "function" ? _a : Object])
+], PartFieldsMappingsController);
+
+
+/***/ }),
+
+/***/ "./src/part-fields-mappings/part-fields-mappings.module.ts":
+/*!*****************************************************************!*\
+  !*** ./src/part-fields-mappings/part-fields-mappings.module.ts ***!
+  \*****************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsMappingsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const typeorm_1 = __webpack_require__(/*! @nestjs/typeorm */ "@nestjs/typeorm");
+const part_fields_mappings_controller_1 = __webpack_require__(/*! ./part-fields-mappings.controller */ "./src/part-fields-mappings/part-fields-mappings.controller.ts");
+const part_fields_mappings_service_1 = __webpack_require__(/*! ./part-fields-mappings.service */ "./src/part-fields-mappings/part-fields-mappings.service.ts");
+const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
+let PartFieldsMappingsModule = class PartFieldsMappingsModule {
+};
+exports.PartFieldsMappingsModule = PartFieldsMappingsModule;
+exports.PartFieldsMappingsModule = PartFieldsMappingsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([schema_1.PartFieldsMappings])],
+        controllers: [part_fields_mappings_controller_1.PartFieldsMappingsController],
+        providers: [part_fields_mappings_service_1.PartFieldsMappingsService],
+    })
+], PartFieldsMappingsModule);
+
+
+/***/ }),
+
+/***/ "./src/part-fields-mappings/part-fields-mappings.service.ts":
+/*!******************************************************************!*\
+  !*** ./src/part-fields-mappings/part-fields-mappings.service.ts ***!
+  \******************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsMappingsService = void 0;
+const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const typeorm_1 = __webpack_require__(/*! @nestjs/typeorm */ "@nestjs/typeorm");
+const typeorm_2 = __webpack_require__(/*! typeorm */ "typeorm");
+const typeorm_3 = __webpack_require__(/*! typeorm */ "typeorm");
+const part_fields_mappings_1 = __webpack_require__(/*! ./dto/part-fields-mappings */ "./src/part-fields-mappings/dto/part-fields-mappings.ts");
+let PartFieldsMappingsService = class PartFieldsMappingsService {
+    constructor(partFieldsMappingsRepository, dataSource) {
+        this.partFieldsMappingsRepository = partFieldsMappingsRepository;
+        this.dataSource = dataSource;
+    }
+    convertToDTO(partFieldsMappings) {
+        const dto = new part_fields_mappings_1.PartFieldsMappingsDTO();
+        dto.id = partFieldsMappings.id;
+        dto.part_field_id = partFieldsMappings.part_field_id;
+        dto.part_id = partFieldsMappings.part_id;
+        dto.value = partFieldsMappings.value;
+        return dto;
+    }
+    async getByPartId(part_id) {
+        const partfieldsmappings = await this.partFieldsMappingsRepository.find({
+            where: {
+                part_id: part_id,
+            },
+        });
+        const data = partfieldsmappings.map((mapping) => this.convertToDTO(mapping));
+        return { data };
+    }
+    async create(data) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const partFields = queryRunner.manager.create(schema_1.PartFieldsMappings, data);
+            await queryRunner.manager.save(partFields);
+            await queryRunner.commitTransaction();
+            return this.convertToDTO(partFields);
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+};
+exports.PartFieldsMappingsService = PartFieldsMappingsService;
+exports.PartFieldsMappingsService = PartFieldsMappingsService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(schema_1.PartFieldsMappings)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_3.DataSource !== "undefined" && typeorm_3.DataSource) === "function" ? _b : Object])
+], PartFieldsMappingsService);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/dto/add-edit.ts":
+/*!*****************************************!*\
+  !*** ./src/part-fields/dto/add-edit.ts ***!
+  \*****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateUpdatePartFieldsDTO = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateUpdatePartFieldsDTO {
+}
+exports.CreateUpdatePartFieldsDTO = CreateUpdatePartFieldsDTO;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUpdatePartFieldsDTO.prototype, "name", void 0);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/dto/part-fields.ts":
+/*!********************************************!*\
+  !*** ./src/part-fields/dto/part-fields.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsDTO = void 0;
+class PartFieldsDTO {
+}
+exports.PartFieldsDTO = PartFieldsDTO;
+
+
+/***/ }),
+
+/***/ "./src/part-fields/index.ts":
+/*!**********************************!*\
+  !*** ./src/part-fields/index.ts ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__webpack_require__(/*! ./part-fields.module */ "./src/part-fields/part-fields.module.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/part-fields.controller.ts":
+/*!***************************************************!*\
+  !*** ./src/part-fields/part-fields.controller.ts ***!
+  \***************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d, _e, _f, _g, _h;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const part_fields_service_1 = __webpack_require__(/*! ./part-fields.service */ "./src/part-fields/part-fields.service.ts");
+const add_edit_1 = __webpack_require__(/*! ./dto/add-edit */ "./src/part-fields/dto/add-edit.ts");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+let PartFieldsController = class PartFieldsController {
+    constructor(partFieldsService) {
+        this.partFieldsService = partFieldsService;
+    }
+    async get() {
+        return this.partFieldsService.get();
+    }
+    async getById(id) {
+        return this.partFieldsService.getById(id);
+    }
+    async create(createPartFieldsDto) {
+        return this.partFieldsService.create(createPartFieldsDto);
+    }
+    async update(id, updatePartFieldsDto) {
+        return this.partFieldsService.update(id, updatePartFieldsDto);
+    }
+    async remove(id) {
+        return this.partFieldsService.remove(id);
+    }
+};
+exports.PartFieldsController = PartFieldsController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+], PartFieldsController.prototype, "get", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+], PartFieldsController.prototype, "getById", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_d = typeof add_edit_1.CreateUpdatePartFieldsDTO !== "undefined" && add_edit_1.CreateUpdatePartFieldsDTO) === "function" ? _d : Object]),
+    __metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+], PartFieldsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_f = typeof add_edit_1.CreateUpdatePartFieldsDTO !== "undefined" && add_edit_1.CreateUpdatePartFieldsDTO) === "function" ? _f : Object]),
+    __metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+], PartFieldsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
+], PartFieldsController.prototype, "remove", null);
+exports.PartFieldsController = PartFieldsController = __decorate([
+    (0, common_1.Controller)('part_fields'),
+    (0, swagger_1.ApiTags)('part_fields'),
+    __metadata("design:paramtypes", [typeof (_a = typeof part_fields_service_1.PartFieldsService !== "undefined" && part_fields_service_1.PartFieldsService) === "function" ? _a : Object])
+], PartFieldsController);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/part-fields.module.ts":
+/*!***********************************************!*\
+  !*** ./src/part-fields/part-fields.module.ts ***!
+  \***********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const typeorm_1 = __webpack_require__(/*! @nestjs/typeorm */ "@nestjs/typeorm");
+const part_fields_controller_1 = __webpack_require__(/*! ./part-fields.controller */ "./src/part-fields/part-fields.controller.ts");
+const part_fields_service_1 = __webpack_require__(/*! ./part-fields.service */ "./src/part-fields/part-fields.service.ts");
+const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
+let PartFieldsModule = class PartFieldsModule {
+};
+exports.PartFieldsModule = PartFieldsModule;
+exports.PartFieldsModule = PartFieldsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([schema_1.PartFields])],
+        controllers: [part_fields_controller_1.PartFieldsController],
+        providers: [part_fields_service_1.PartFieldsService],
+    })
+], PartFieldsModule);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/part-fields.service.ts":
+/*!************************************************!*\
+  !*** ./src/part-fields/part-fields.service.ts ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsService = void 0;
+const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const typeorm_1 = __webpack_require__(/*! @nestjs/typeorm */ "@nestjs/typeorm");
+const typeorm_2 = __webpack_require__(/*! typeorm */ "typeorm");
+const typeorm_3 = __webpack_require__(/*! typeorm */ "typeorm");
+const part_fields_1 = __webpack_require__(/*! ./dto/part-fields */ "./src/part-fields/dto/part-fields.ts");
+let PartFieldsService = class PartFieldsService {
+    constructor(partFieldsRepository, dataSource) {
+        this.partFieldsRepository = partFieldsRepository;
+        this.dataSource = dataSource;
+    }
+    convertToDTO(partFields) {
+        const dto = new part_fields_1.PartFieldsDTO();
+        dto.id = partFields.id;
+        dto.name = partFields.name;
+        return dto;
+    }
+    async get() {
+        const partFields = await this.partFieldsRepository.find();
+        const data = partFields.map((partfield) => this.convertToDTO(partfield));
+        return { data };
+    }
+    async getById(id) {
+        const partFields = await this.partFieldsRepository.findOne({
+            where: { id },
+        });
+        if (!partFields) {
+            throw new common_1.NotFoundException(`PartFields with id ${id} not found`);
+        }
+        return this.convertToDTO(partFields);
+    }
+    async create(data) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const existingPartFields = await queryRunner.manager.findOne(schema_1.PartFields, {
+                where: { name: data.name },
+            });
+            if (existingPartFields) {
+                throw new Error('Name must be unique');
+            }
+            const partFields = queryRunner.manager.create(schema_1.PartFields, data);
+            await queryRunner.manager.save(partFields);
+            await queryRunner.commitTransaction();
+            return this.convertToDTO(partFields);
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async update(id, data) {
+        const partFields = await this.partFieldsRepository.findOne({
+            where: { id },
+        });
+        if (!partFields) {
+            throw new common_1.NotFoundException(`PartFields with id ${id} not found`);
+        }
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const existingPartFields = await queryRunner.manager.findOne(schema_1.PartFields, {
+                where: { name: data.name, id: (0, typeorm_2.Not)(id) },
+            });
+            if (existingPartFields) {
+                throw new Error('Name must be unique');
+            }
+            Object.assign(partFields, data);
+            await queryRunner.manager.save(partFields);
+            await queryRunner.commitTransaction();
+            return this.convertToDTO(partFields);
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async remove(id) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const partFields = await queryRunner.manager.findOne(schema_1.PartFields, {
+                where: { id },
+            });
+            if (!partFields) {
+                throw new common_1.NotFoundException(`PartFields with id ${id} not found`);
+            }
+            await queryRunner.manager.remove(schema_1.PartFields, partFields);
+            await queryRunner.commitTransaction();
+            return { message: 'Deleted Successfully', title: partFields.name };
+        }
+        catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+};
+exports.PartFieldsService = PartFieldsService;
+exports.PartFieldsService = PartFieldsService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(schema_1.PartFields)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_3.DataSource !== "undefined" && typeorm_3.DataSource) === "function" ? _b : Object])
+], PartFieldsService);
 
 
 /***/ }),
@@ -22845,7 +23556,7 @@ module.exports = require("path");
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it uses a non-standard name for the exports (exports).
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
 /*!*********************!*\
