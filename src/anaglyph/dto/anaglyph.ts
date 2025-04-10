@@ -87,6 +87,7 @@ export class PartDTO {
   quantity: any;
   nomenclature: any;
   medias: PartMedia[];
+  dynamic_fields:any;
   created_at: string;
 }
 
@@ -98,5 +99,15 @@ export interface PartResposeDTO {
 
 export interface PartDetailsResposeDTO {
   part: PartDTO;
+  message: string;
+}
+
+export class PartFieldsDTO {
+  id: string;
+  name: string;
+}
+
+export class PartFieldsResponseDTO {
+  part_fields: PartFieldsDTO[];
   message: string;
 }

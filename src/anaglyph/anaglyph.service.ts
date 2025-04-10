@@ -16,6 +16,7 @@ import {
   Note,
   Part,
   PartNotes,
+  PartFields,
 } from '@app/schema';
 import * as fs from 'fs';
 import * as csv from 'csv-parser';
@@ -29,6 +30,8 @@ import {
   PartResposeDTO,
   PartDTO,
   PartDetailsResposeDTO,
+  PartFieldsDTO,
+  PartFieldsResponseDTO,
 } from './dto/anaglyph';
 import { MediaService } from 'src/media/media.service';
 import {
@@ -58,6 +61,9 @@ export class AnaglyphService {
 
     @InjectRepository(AttachedMedia)
     private readonly attachedMediaRepository: Repository<AttachedMedia>,
+
+    @InjectRepository(PartFields)
+    private readonly partFieldsRepository: Repository<PartFields>,
 
     private dataSource: DataSource,
     private mediaService: MediaService,
@@ -144,6 +150,14 @@ export class AnaglyphService {
     return response;
   }
 
+  private async convertToPartFieldsDTO(partField: PartFields): Promise<PartFieldsDTO> {
+    const temp = {
+      id: partField.id,
+      name: partField.name
+    };
+    return temp;
+  }
+
   private async convertToPartDTO(part: Part): Promise<PartDTO> {
     const temp = {
       id: part.id,
@@ -162,6 +176,7 @@ export class AnaglyphService {
       part_name: part.part_name,
       purchase_url: part.purchase_url,
       quantity: part.quantity,
+      dynamic_fields: part.dynamic_fields,
     };
     return temp;
   }
@@ -316,7 +331,7 @@ export class AnaglyphService {
       message: 'Success',
     };
   }
-
+  
   async create(modelId: string, data: AddEditRequestDTO) {
     const model = await this.modelRepository.findOne({
       where: { id: modelId },
@@ -1077,6 +1092,7 @@ export class AnaglyphService {
                 existingPart.quantity = record['quantity']
                   ? Number(record['quantity'])
                   : 0;
+                existingPart.dynamic_fields = record['dynamic_fields'];
 
                 await queryRunner.manager.save(existingPart);
               } else {
@@ -1091,6 +1107,7 @@ export class AnaglyphService {
                   manufacturer_code: record['mfr_code'],
                   quantity: record['quantity'] ? Number(record['quantity']) : 0,
                   anaglyph: anaglyph,
+                  dynamic_fields: record['dynamic_fields'],
                 });
 
                 await queryRunner.manager.save(part);

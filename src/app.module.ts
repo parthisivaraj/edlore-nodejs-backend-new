@@ -41,7 +41,8 @@ import { PermissionsModule } from './permission/permission.module';
 import { StepModule } from './step';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './response-interceptor.service';
-
+import { PartFieldsModule } from './part-fields';
+import { PartFieldsMappingsModule } from './part-fields-mappings';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -91,6 +92,8 @@ import { ResponseInterceptor } from './response-interceptor.service';
     SyncModule,
     StepModule,
     RealiseNoteModule,
+    PartFieldsModule,
+    PartFieldsMappingsModule,
   ],
   controllers: [],
   providers: [
