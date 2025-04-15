@@ -16,7 +16,12 @@ import { MediaService } from './media.service';
 import { MediaSearchParams } from './dto/search';
 import { MediaDTO, UpdateMediaDTO } from './dto/response';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateMediaDTO, UploadFileParams } from './dto/upload';
+import {
+  CreateAWSMediaDTO,
+  CreateMediaDTO,
+  CreateUnityAWSMediaDTO,
+  UploadFileParams,
+} from './dto/upload';
 
 @Controller('media')
 @ApiTags('media')
@@ -42,6 +47,19 @@ export class MediaController {
     @Req() req: any,
   ) {
     return await this.mediaService.createMedia(file, body, req.user.org_id);
+  }
+
+  @Post('create_aws_media')
+  async createAWSMedia(@Body() body: CreateAWSMediaDTO, @Req() req: any) {
+    return await this.mediaService.createAWSMedia(body, req.user.org_id);
+  }
+
+  @Post('create_unity_aws_media')
+  async createUnityAWSMedia(
+    @Body() body: CreateUnityAWSMediaDTO,
+    @Req() req: any,
+  ) {
+    return await this.mediaService.createAWSMediaUnity(body, req.user.org_id);
   }
 
   @Post('chunk')

@@ -6,6 +6,7 @@ import {
   Headers,
   HttpCode,
   Post,
+  Query,
   Request,
   Response,
   UnauthorizedException,
@@ -24,7 +25,7 @@ import {
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('sign_in')
   @Public()
@@ -91,6 +92,7 @@ export class AuthController {
   }
 
   @Post('forgot_password_reset')
+  @Public()
   @HttpCode(200)
   async forgotPasswordReset(@Body() resetPasswordDto: ResetPasswordDto) {
     try {
@@ -122,15 +124,37 @@ export class AuthController {
     return await this.authService.resetPassword(resetPasswordDto);
   }
 
-  // @Get('get_opt')
-  // async getOTP(@Body() { email }: { email: string }) {
-  //   return await this.authService.getOTP(email);
-  // }
+  @Get('get_opt')
+  @Public()
+  async getOTP(@Query('email') email: string) {
+    return await this.authService.getOtp(email);
+  }
 
   @Post('verify_otp')
+  @Public()
   @HttpCode(200)
-  async verifyOTP(@Body() { email, otp }: { email: string; otp: string }) {
+  async verifyOTP(@Query('email') email: string, @Query('otp') otp: string) {
     return await this.authService.verifyOTP(email, otp);
+  }
+
+  @Post('reset_forgot_password')
+  @Public()
+  async resetfForgotPassword(
+    @Body('email') email: string,
+    @Body('otp') otp: string,
+    @Body('password') password: string,
+    @Body('password_confirmation') password_confirmation: string,
+  ): Promise<any> {
+    try {
+      return await this.authService.forgotPasswordReset(
+        email,
+        otp,
+        password,
+        password_confirmation,
+      );
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Get('store_hashed_password')

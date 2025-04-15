@@ -32,9 +32,16 @@ export class PermissionService {
     }
 
     if (role_id) {
-      queryBuilder.andWhere('role_permissions.role_id = :role_id', {
-        role_id,
-      });
+      // queryBuilder.andWhere('role_permissions.role_id = :role_id', {
+      //   role_id,
+      // });
+      queryBuilder
+        .addSelect(
+          `CASE WHEN role_permissions.role_id IN (:...ids) THEN 0 ELSE 1 END`,
+          'rank',
+        ) // Add computed field
+        .orderBy('rank', 'ASC')
+        .setParameter('ids', [role_id]);
     }
 
     const [permissions, totalEntries] = await queryBuilder.getManyAndCount();

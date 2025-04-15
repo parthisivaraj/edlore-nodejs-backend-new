@@ -1,8 +1,10 @@
 import { DeviceToken, OTP, User } from '@app/schema';
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
@@ -18,6 +20,8 @@ import * as crypto from 'crypto';
 import { AppConfigService } from '@app/config';
 import { JwtUserPayload } from '@app/schema/dto';
 import { MediaService } from 'src/media';
+import { ClientData } from 'src/organization/organization.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +38,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private configService: AppConfigService,
     private mediaService: MediaService,
+    private mailerService: MailerService,
   ) {
     const config = this.configService.getAWSConfig();
     this.frontendURL = config.frontEndURL;
@@ -50,13 +55,16 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload);
 
+    const { client } = this.configService.getClient();
+    const clientData = ClientData[client.toLowerCase()];
+
     const data = {
       access_token: accessToken,
       org_id: org.id,
       org_name: org.name,
-      org_logo: `${this.frontendURL}/af-logo-300x_a.png`,
-      org_logo_png: `${this.frontendURL}/af-logo-300x_a.png`,
-      org_logo_2x_png: `${this.frontendURL}/af-logo-300x_a.png`,
+      org_logo: `${this.frontendURL}/${clientData.org_logo}`,
+      org_logo_png: `${this.frontendURL}/${clientData.org_logo}`,
+      org_logo_2x_png: `${this.frontendURL}/${clientData.org_logo}`,
       user_name: `${user.first_name} ${user.last_name}`,
       user_profile_image: `${this.frontendURL}/user-default.png`,
       role: role?.role.title || null,
@@ -94,9 +102,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    const machineInfo = this.configService.getMachineInfo();
+
     if (fromAdmin) {
-      const otpCode = this.generateNumericOTP();
-      // let otpCode = '123456';
+      let otpCode = '123456';
+
+      if (machineInfo.mode === 'ONLINE') {
+        otpCode = this.generateNumericOTP();
+      }
 
       const token = crypto.randomBytes(16).toString('hex');
       const otp = new OTP();
@@ -110,6 +123,19 @@ export class AuthService {
         await this.otpRepository.save(otp);
       } catch {
         throw new BadRequestException('Error saving OTP to database');
+      }
+
+      if (machineInfo.mode === 'ONLINE') {
+        await this.mailerService.sendMail({
+          to: user.email,
+          subject: 'Check the verfication code for Edlore',
+          template: './otp.mailer.hbs',
+          context: {
+            otp: otpCode,
+            name: user.first_name,
+            media_domain: this.configService.getMailerConfig().media_domain,
+          },
+        });
       }
 
       console.log(`OTP for ${email}: ${otpCode}`);
@@ -190,12 +216,13 @@ export class AuthService {
       throw new BadRequestException('User not found');
     }
 
-    let otpCode = '123456';
+    // TODO: Need to fix
+    const otpCode = '123456';
 
-    const machineInfo = this.configService.getMachineInfo();
-    if (machineInfo.mode === 'ONLINE') {
-      otpCode = this.generateNumericOTP();
-    }
+    // const machineInfo = this.configService.getMachineInfo();
+    // if (machineInfo.mode === 'ONLINE') {
+    //   otpCode = this.generateNumericOTP();
+    // }
 
     const otp = new OTP();
     otp.user = user;
@@ -311,14 +338,10 @@ export class AuthService {
       throw new BadRequestException('OTP not found');
     }
 
-    console.log('Found OTP:', otp);
-
     const expirationTime = new Date(
       otp.created_at.getTime() + 24 * 60 * 60 * 1000,
     );
 
-    console.log('Current server time:', new Date());
-    console.log('OTP expiration time:', expirationTime);
     if (new Date() > expirationTime) {
       console.error(
         `OTP expired at ${expirationTime}, current time is ${new Date()}`,
@@ -350,5 +373,134 @@ export class AuthService {
       hashedPassword,
       message: 'Hashed password stored successfully in the database.',
     };
+  }
+
+  async getOtp(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'User Not Found',
+        data: {},
+      };
+    }
+    const machineInfo = this.configService.getMachineInfo();
+
+    let otpCode = '123456';
+
+    if (machineInfo.mode === 'ONLINE') {
+      otpCode = this.generateNumericOTP();
+    }
+
+    const existingOtp = await this.otpRepository.findOne({
+      where: {
+        user: { id: user.id },
+        verification_type: '2FA',
+      },
+      order: { created_at: 'DESC' },
+    });
+
+    if (existingOtp) {
+      await this.otpRepository.delete(existingOtp.id);
+    }
+
+    const token = crypto.randomBytes(16).toString('hex');
+    const otp = new OTP();
+    otp.user = user;
+    otp.otp = otpCode;
+    otp.created_at = new Date();
+    otp.verification_type = '2FA';
+    otp.token = token;
+
+    try {
+      await this.otpRepository.save(otp);
+
+      if (machineInfo.mode === 'ONLINE') {
+        await this.mailerService.sendMail({
+          to: user.email,
+          subject: 'Your OTP Code',
+          template: './forgot-password.mailer.hbs',
+          context: {
+            otp: otpCode,
+            name: user.first_name,
+            media_domain: this.configService.getMailerConfig().media_domain,
+          },
+        });
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'OTP sent successfully',
+        data: {},
+      };
+    } catch {
+      throw new BadRequestException('Failed to create OTP.');
+    }
+  }
+
+  async forgotPasswordReset(
+    email: string,
+    otp: string,
+    password: string,
+    password_confirmation: string,
+  ): Promise<{
+    statusCode: HttpStatus;
+    message: string;
+    status: boolean;
+  }> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const userOtp = await this.otpRepository.findOne({
+      where: {
+        user: { id: user.id },
+        verification_type: '2FA',
+      },
+      order: { created_at: 'DESC' },
+    });
+
+    if (userOtp?.otp === otp) {
+      const otpAge = Date.now() - new Date(userOtp.created_at).getTime();
+      if (otpAge < 300000) {
+        if (password !== password_confirmation) {
+          throw new BadRequestException(
+            'Password and confirmation password do not match',
+          );
+        }
+
+        try {
+          user.encrypted_password = await bcrypt.hash(password, 10);
+          await this.userRepository.save(user);
+
+          await this.mailerService.sendMail({
+            to: user.email,
+            subject: 'Password Changed Successfully',
+            template: './password-changed-confirmation.mailer.hbs',
+            context: {
+              email: user.email,
+              name: user.first_name,
+              password: password,
+              media_domain: this.configService.getMailerConfig().media_domain,
+              frontEndDomain: this.configService.getMailerConfig().login_domain,
+            },
+          });
+
+          return {
+            statusCode: HttpStatus.OK,
+            message: 'Successfully updated the password',
+            status: true,
+          };
+        } catch (error) {
+          throw new UnprocessableEntityException(
+            'Failed! Something went wrong.' + error,
+          );
+        }
+      } else {
+        throw new BadRequestException('OTP Expired.');
+      }
+    }
   }
 }

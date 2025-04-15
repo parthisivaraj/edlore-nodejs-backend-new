@@ -88,6 +88,7 @@ export class PartDTO {
   nomenclature: any;
   medias: PartMedia[];
   dynamic_fields:any;
+  part_fields:any;
   created_at: string;
 }
 

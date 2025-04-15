@@ -5,12 +5,12 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
   Query,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -40,8 +40,13 @@ export class DeviceController {
 
   @Post('')
   @UseInterceptors(AnyFilesInterceptor())
-  async create(@Body() data: CreateDeviceDto) {
-    return await this.deviceService.create(data);
+  async create(
+    @Body() data: CreateDeviceDto,
+    @UploadedFiles() files: Express.Multer.File[], // This will contain uploaded files, including the image
+  ) {
+    const image = (files || []).find((file) => file.fieldname === 'image'); // Extract the image file
+
+    return await this.deviceService.create(data, image);
   }
 
   @Put(':id')
@@ -79,10 +84,6 @@ export class DeviceController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const result = await this.deviceService.remove(id);
-    if (!result.affected) {
-      throw new NotFoundException(`Device with ID ${id} not found`);
-    }
-    return { message: 'Device deleted successfully' };
+    return await this.deviceService.remove(id);
   }
 }

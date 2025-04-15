@@ -121,9 +121,7 @@ export class SectionService {
       'title',
       data.title,
       {
-        model_id: {
-          id: modelId,
-        },
+        model_id: modelId,
       },
     );
     if (duplicateTitle) {
@@ -150,9 +148,7 @@ export class SectionService {
       'title',
       data.title,
       {
-        model_id: {
-          id: modelId,
-        },
+        model_id: modelId,
       },
       id,
     );

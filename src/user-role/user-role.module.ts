@@ -9,6 +9,7 @@ import { DBSchemas } from '@app/schema';
     DBSchemas.user,
     DBSchemas.role,
     DBSchemas.permission,
+    DBSchemas.rolePermissions,
   ],
   controllers: [UserRoleController],
   providers: [UserRoleService],

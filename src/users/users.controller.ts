@@ -83,8 +83,12 @@ export class UsersController {
 
   @Post('')
   @UseInterceptors(AnyFilesInterceptor())
-  async create(@Body() data: CreateUserDTO) {
-    return await this.userService.create(data);
+  async create(
+    @Body() data: CreateUserDTO,
+    @UploadedFiles() files: Express.Multer.File[], // This will contain uploaded files, including the image
+  ) {
+    const image = (files || []).find((file) => file.fieldname === 'image'); // Extract the image file
+    return await this.userService.create(data, image);
   }
 
   @Post('change_status')

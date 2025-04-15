@@ -27,6 +27,8 @@ import { DateUtilsService } from '@app/common-utils';
 import * as bcrypt from 'bcrypt';
 import { SearchParamsDTO } from '@app/schema/dto';
 import { MediaService } from 'src/media';
+import { MailerService } from '@nestjs-modules/mailer';
+import { AppConfigService } from '@app/config';
 
 @Injectable()
 export class UserService {
@@ -38,6 +40,8 @@ export class UserService {
 
     private filterService: FilterService,
     private mediaService: MediaService,
+    private mailerService: MailerService,
+    private configService: AppConfigService,
   ) {}
 
   private async convertToDTO(user: User): Promise<UserResponseDto> {
@@ -253,7 +257,7 @@ export class UserService {
     return await this.convertToDTO(user);
   }
 
-  async create(data: CreateUserDTO): Promise<UserResponseDto> {
+  async create(data: CreateUserDTO, image: any): Promise<UserResponseDto> {
     const emailCheck = await this.userRepository.count({
       where: { email: data.email.toLowerCase() },
     });
@@ -285,7 +289,7 @@ export class UserService {
         identification_code: data.identification_code,
         org_id: data.org_id,
         password_renewed: data.password_renewed,
-        encrypted_password:  encrypted_password,
+        encrypted_password: encrypted_password,
         status: ActiveStatus.Active,
       });
       const savedUser = await this.userRepository.save(user);
@@ -297,6 +301,36 @@ export class UserService {
         updated_at: new Date(),
       });
       await queryRunner.commitTransaction();
+
+      const machineInfo = this.configService.getMachineInfo();
+      if (image) {
+        await this.mediaService.saveMedia(
+          image,
+          {
+            media_title: user.first_name,
+            media_type: 'image',
+            name: 'image',
+            record_id: savedUser.id,
+            record_type: 'User',
+          },
+          machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon',
+        );
+      }
+
+      if (machineInfo.mode === 'ONLINE') {
+        await this.mailerService.sendMail({
+          to: user.email,
+          subject: "Welcome to Edlore! Let's get started.",
+          template: './welcome.mailer.hbs',
+          context: {
+            name: user.first_name,
+            email: user.email,
+            password: data.password,
+            media_domain: this.configService.getMailerConfig().media_domain,
+            frontEndDomain: this.configService.getMailerConfig().login_domain,
+          },
+        });
+      }
 
       return await this.convertToDTO(savedUser);
     } catch (error) {
@@ -404,14 +438,20 @@ export class UserService {
     }
 
     if (image) {
+      const machineInfo = this.configService.getMachineInfo();
+
       await this.mediaService.deleteRecordMedia(user.id, 'User');
-      await this.mediaService.saveMedia(image, {
-        media_title: first_name,
-        media_type: 'image',
-        name: 'image',
-        record_id: user.id,
-        record_type: 'User',
-      });
+      await this.mediaService.saveMedia(
+        image,
+        {
+          media_title: first_name,
+          media_type: 'image',
+          name: 'image',
+          record_id: user.id,
+          record_type: 'User',
+        },
+        machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon',
+      );
     }
     user.first_name = first_name;
     user.last_name = last_name;
@@ -424,11 +464,13 @@ export class UserService {
     delete user.user_roles;
 
     const newData = await this.userRepository.save(user);
+
+    const resultData = await this.currentUserDetails(id);
     return {
       user_id: id,
       Message: 'Successfully Updated the User',
       user: {
-        ...newData,
+        ...resultData,
         full_name: `${newData.first_name} ${newData.last_name}`,
       } as any,
     };

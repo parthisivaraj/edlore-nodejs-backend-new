@@ -214,7 +214,7 @@ export class CategoriesService {
       );
 
     // Handle pagination
-    const take = !params.limit ? undefined : 10; // Set your desired pagination limit
+    const take = !params.limit ? undefined : params.limit; // Set your desired pagination limit
     const skip = (params.page - 1) * take;
     const [categories, total] = await queryBuilder
       .skip(skip)
@@ -434,18 +434,17 @@ export class CategoriesService {
       //   org_id: data.org_id,
       //   sub_categories: data.sub_categories_attributes,
       // });
-      
+
       category.name = data.name || category.name;
       category.sub_categories = category.sub_categories || [];
-  
 
       if (data.sub_categories_attributes) {
         for (const subCategoryData of data.sub_categories_attributes) {
           if (subCategoryData.id) {
             let subCategory = category.sub_categories.find(
-              (sub) => sub.id === subCategoryData.id
+              (sub) => sub.id === subCategoryData.id,
             );
-  
+
             if (subCategory) {
               subCategory.name = subCategoryData.name || subCategory.name;
             } else {
@@ -464,7 +463,7 @@ export class CategoriesService {
           }
         }
       }
-      
+
       await this.categoryRepository.save(category);
 
       return {

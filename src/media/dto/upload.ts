@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class UploadFileParams {
   @IsString()
@@ -31,4 +31,26 @@ export class CreateMediaDTO {
   media_title: string;
   @IsString()
   media_type: string;
+}
+
+export class CreateAWSMediaDTO {
+  @IsString()
+  media_title: string;
+  @IsString()
+  media_type: string;
+  @IsString()
+  original_file_name: string;
+  @IsString()
+  mime_type: string;
+  @IsNumber()
+  byte_size: number;
+  @IsString()
+  key: string;
+}
+
+export class CreateUnityAWSMediaDTO extends CreateAWSMediaDTO {
+  @IsString()
+  mediable_type: string;
+  @IsString()
+  mediable_id: string;
 }

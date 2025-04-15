@@ -193,9 +193,7 @@ export class ProcedureService {
       'name',
       data.name,
       {
-        model_id: {
-          id: modelId,
-        },
+        model_id: modelId,
       },
     );
     if (duplicateTitle) {

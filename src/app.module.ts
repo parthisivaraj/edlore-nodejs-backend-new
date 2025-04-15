@@ -41,8 +41,10 @@ import { PermissionsModule } from './permission/permission.module';
 import { StepModule } from './step';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './response-interceptor.service';
+import { MailModule } from './mailer/mail.module';
 import { PartFieldsModule } from './part-fields';
 import { PartFieldsMappingsModule } from './part-fields-mappings';
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -53,6 +55,7 @@ import { PartFieldsMappingsModule } from './part-fields-mappings';
     AppConfigModule,
     SchemaModule,
     // MongoSchemaModule,
+    MailModule,
     HealthModule,
     OrganizationModule,
     AuthModule,
