@@ -24,10 +24,19 @@ import { AttachedMediaDTO } from '@app/schema/dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { CreateMediaDTO, SaveMediaDTO, UploadFileParams } from './dto/upload';
+import {
+  CreateAWSMediaDTO,
+  CreateMediaDTO,
+  CreateUnityAWSMediaDTO,
+  SaveMediaDTO,
+  UploadFileParams,
+} from './dto/upload';
 import * as mime from 'mime-types';
 import axios from 'axios';
 import { CommonUtilsService } from '@app/common-utils';
+// import * as thumbsupply from 'thumbsupply';
+// import { fromPath } from 'pdf2pic';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MediaService {
@@ -200,6 +209,65 @@ export class MediaService {
     };
   }
 
+  // private getPdfThumbnail = async (pdfPath) => {
+  //   // Get filename without extension
+  //   const baseName = path.basename(pdfPath, path.extname(pdfPath));
+  //   const thumbnailPath = path.join(this.publicFolder, `${baseName}.jpg`);
+  //   if (fs.existsSync(thumbnailPath)) {
+  //     return thumbnailPath;
+  //   }
+
+  //   if (!fs.existsSync(this.publicFolder)) {
+  //     fs.mkdirSync(this.publicFolder, { recursive: true });
+  //   }
+
+  //   try {
+  //     const options = {
+  //       density: 100,
+  //       width: 300,
+  //       height: 300,
+  //     };
+  //     const convert = fromPath(pdfPath, options);
+  //     const pageToConvertAsImage = 1;
+
+  //     const image: any = await convert(pageToConvertAsImage, {
+  //       responseType: 'image',
+  //     });
+  //     console.log('🚀 ~ MediaService ~ getPdfThumbnail= ~ image:', image);
+  //     await fs.writeFileSync(thumbnailPath, image.buffer);
+
+  //     return thumbnailPath; // Return new thumbnail path
+  //   } catch (error) {
+  //     console.error('Error generating thumbnail:', error);
+  //     throw error;
+  //   }
+  // };
+
+  // private getVideoThumbnail = async (pdfPath) => {
+  //   // Get filename without extension
+  //   const baseName = path.basename(pdfPath, path.extname(pdfPath));
+  //   const thumbnailPath = path.join(this.publicFolder, `${baseName}.jpg`);
+  //   if (fs.existsSync(thumbnailPath)) {
+  //     return `${this.frontendURL}/uploads/${baseName}.jpg`;
+  //   }
+
+  //   if (!fs.existsSync(this.publicFolder)) {
+  //     fs.mkdirSync(this.publicFolder, { recursive: true });
+  //   }
+
+  //   try {
+  //     const output = await thumbsupply.generateThumbnail(pdfPath, {
+  //       mimetype: 'video/mp4',
+  //     });
+  //     fs.renameSync(output, thumbnailPath);
+
+  //     return `${this.frontendURL}/uploads/${baseName}.jpg`; // Return new thumbnail path
+  //   } catch (error) {
+  //     console.error('Error generating thumbnail:', error);
+  //     throw error;
+  //   }
+  // };
+
   private async getSignedUrl(
     blob: ActiveStorageBlob,
     // key: string,
@@ -215,6 +283,11 @@ export class MediaService {
       }
       return url;
     }
+    const metadata = blob.metadata ? JSON.parse(blob.metadata) : {};
+
+    if (metadata?.public) {
+      return blob.key;
+    }
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: blob.key,
@@ -226,14 +299,23 @@ export class MediaService {
   async getThumbnailUrl(
     fileType: string,
     blob: ActiveStorageBlob,
-    // key: string,
-    // service_name: 'local' | 'amazon',
   ): Promise<string> {
     switch (fileType) {
       // case 'video':
       //   return `${this.frontendURL}/image-video.png`;
 
       case 'pdf':
+        // const url = `${this.frontendURL}/uploads/${blob.key}`;
+        // console.log('🚀 ~ MediaService ~ url:', url);
+        // const baseName = path.basename(blob.key, path.extname(blob.key));
+        // const url = path.join(this.publicFolder, blob.key);
+        // if (fs.existsSync(url)) {
+        //   return await this.getPdfThumbnail(url);
+        // }
+        // return `${this.frontendURL}/image-pdf.png`;
+        // if (blob.file_type === 'pdf') {
+
+        // }
         return `${this.frontendURL}/image-pdf.png`;
 
       case 'csv':
@@ -249,8 +331,13 @@ export class MediaService {
         return `${this.frontendURL}/image-zip.png`;
 
       case 'image':
-      case 'video':
         return this.getSignedUrl(blob);
+      case 'video':
+        // const videoUrl = path.join(this.publicFolder, blob.key);
+        // if (fs.existsSync(videoUrl)) {
+        //   return await this.getVideoThumbnail(videoUrl);
+        // }
+        return `${this.frontendURL}/image-video.png`;
 
       default:
         return `${this.frontendURL}/image-other.png`;
@@ -436,15 +523,108 @@ export class MediaService {
     file: Express.Multer.File,
     body: CreateMediaDTO,
     org_id: string,
+    service_name?: 'local' | 'amazon',
   ) {
     try {
-      const result = await this.saveMedia(file, {
-        media_title: body.media_title,
-        media_type: body.media_type,
+      const result = await this.saveMedia(
+        file,
+        {
+          media_title: body.media_title,
+          media_type: body.media_type,
+          record_id: org_id,
+          record_type: 'Organization',
+          name: 'medias',
+        },
+        service_name,
+      );
+
+      const media = this.attachmentMediaRepository.create({
+        active_storage_attachment_id: result.id as any,
+        created_at: new Date(),
+        mediable_type: body.mediable_type,
+        mediable_id: body.mediable_id,
+        file_type: null,
+      });
+      await this.attachmentMediaRepository.save(media);
+
+      return {
+        message: 'Successfully added to library and attached',
+      };
+    } catch (error) {
+      console.log('🚀 ~ MediaService ~ createMedia ~ error:', error);
+      throw new BadRequestException({
+        is_sucess: false,
+        message: 'Something went wrong, please try again later!',
+      });
+    }
+  }
+
+  async createAWSMedia(body: CreateAWSMediaDTO, org_id: string) {
+    try {
+      const blob = this.blobRepository.create({
+        created_at: new Date(),
+        key: body.key,
+        filename: body.original_file_name,
+        service_name: 'amazon',
+        content_type: body.mime_type,
+        byte_size: body.byte_size,
+        checksum: uuidv4(),
+        metadata: {
+          public: true,
+        },
+        title: body.media_title,
+        file_type: body.media_type || 'other',
+      });
+      await this.blobRepository.save(blob);
+
+      const attachment = this.attachmentRepository.create({
+        created_at: new Date(),
+        blob_id: blob.id,
         record_id: org_id,
         record_type: 'Organization',
         name: 'medias',
       });
+      await this.attachmentRepository.save(attachment);
+
+      return {
+        is_success: true,
+        file_url: body.key,
+      };
+    } catch (error) {
+      console.log('🚀 ~ MediaService ~ createMedia ~ error:', error);
+      throw new BadRequestException({
+        is_sucess: false,
+        message: 'Something went wrong, please try again later!',
+      });
+    }
+  }
+
+  async createAWSMediaUnity(body: CreateUnityAWSMediaDTO, org_id: string) {
+    try {
+      const blob = this.blobRepository.create({
+        created_at: new Date(),
+        key: body.key,
+        filename: body.original_file_name,
+        service_name: 'amazon',
+        content_type: body.mime_type,
+        byte_size: body.byte_size,
+        checksum: uuidv4(),
+        metadata: {
+          public: true,
+        },
+        title: body.media_title,
+        file_type: body.media_type || 'other',
+      });
+      await this.blobRepository.save(blob);
+
+      const attachment = this.attachmentRepository.create({
+        created_at: new Date(),
+        blob_id: blob.id,
+        record_id: org_id,
+        record_type: 'Organization',
+        name: 'medias',
+      });
+      const result = await this.attachmentRepository.save(attachment);
 
       const media = this.attachmentMediaRepository.create({
         active_storage_attachment_id: result.id as any,
@@ -671,7 +851,10 @@ export class MediaService {
       content_type: blob.content_type,
       file_name: blob.filename,
       file_type: blob.file_type,
-      url: `${this.publicFolder}/${blob.key}`,
+      url:
+        blob.service_name === 'local'
+          ? `${this.publicFolder}/${blob.key}`
+          : blob.key,
       thumb_url: await this.getThumbnailUrl(blob.file_type, blob),
     };
   }
@@ -697,7 +880,11 @@ export class MediaService {
     }
   }
 
-  async saveMedia(file: Express.Multer.File, data: SaveMediaDTO) {
+  async saveMedia(
+    file: Express.Multer.File,
+    data: SaveMediaDTO,
+    service_name?: 'local' | 'amazon',
+  ) {
     const fileData = await this.uploadFile(file);
     const config = this.configService.getMachineInfo();
 
@@ -708,7 +895,8 @@ export class MediaService {
       created_at: new Date(),
       key: fileData.file_name,
       filename: fileData.file_name,
-      service_name: config.mode === 'OFFLINE' ? 'local' : 'amazon',
+      service_name:
+        service_name || config.mode === 'OFFLINE' ? 'local' : 'amazon',
       content_type: mime_type,
       byte_size: file.buffer.length,
       checksum,

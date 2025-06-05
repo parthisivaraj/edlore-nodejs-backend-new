@@ -217,9 +217,7 @@ export class TroubleshootService {
       'title',
       data.title,
       {
-        model_id: {
-          id: modelId,
-        },
+        model_id: modelId,
       },
     );
     if (duplicateTitle) {

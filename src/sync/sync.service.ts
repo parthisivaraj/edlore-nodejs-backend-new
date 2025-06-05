@@ -89,8 +89,11 @@ export class SyncService {
 
       const lastSyncAt = new Date(machine.last_sync_at); // Convert to Date object
       lastSyncAt.setHours(lastSyncAt.getHours() - 12); // Move back 24 hours
+
+      const config = this.appConfigService.getPort();
+
       const url = GetSyncAPI(
-        machine.ipaddress,
+        `${machine.ipaddress}:${config.port}`,
         DateUtilsService.dateToString(lastSyncAt, DateFormat.serverDate),
       );
       const response = await axios.get(url, {
@@ -125,7 +128,9 @@ export class SyncService {
         sync_start_at: new Date(),
         sync_status: 'Processing',
       });
-      const url = PostSyncAPI(machine.ipaddress);
+      const config = this.appConfigService.getPort();
+
+      const url = PostSyncAPI(`${machine.ipaddress}:${config.port}`);
 
       const formData = new FormData();
       formData.append('file', zipBuffer, {
@@ -167,7 +172,9 @@ export class SyncService {
       const machine = surfacePros[index];
       if (!machine.is_syncing) {
         try {
-          const url = GetHealthAPI(machine.ipaddress);
+          const config = this.appConfigService.getPort();
+
+          const url = GetHealthAPI(`${machine.ipaddress}:${config.port}`);
           console.log('🚀 ~ SyncService ~ syncMachineCron ~ url:', url);
           await axios.get(url, {
             timeout: 10000,
@@ -196,7 +203,9 @@ export class SyncService {
         const machine = surfacePros[index];
         if (!machine.is_syncing) {
           try {
-            const url = GetHealthAPI(machine.ipaddress);
+            const portConfig = this.appConfigService.getPort();
+
+            const url = GetHealthAPI(`${machine.ipaddress}:${portConfig.port}`);
             console.log('🚀 ~ SyncService ~ syncMachineCron ~ url:', url);
             await axios.get(url, {
               timeout: 10000,

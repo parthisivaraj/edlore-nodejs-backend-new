@@ -80,6 +80,11 @@ export class UserRoleSearchParams extends SearchParamsDTO {
   user_id?: string;
 }
 
+export class RolePermissionsAttributeDto {
+  @IsString()
+  permission_id: string;
+}
+
 export class CreateUserRoleDto {
   @IsString()
   title: string;
@@ -89,5 +94,5 @@ export class CreateUserRoleDto {
   description?: string;
 
   @IsArray()
-  permissions: string[];
+  role_permissions_attributes: RolePermissionsAttributeDto[];
 }

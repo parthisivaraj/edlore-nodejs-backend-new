@@ -1,7 +1,7 @@
 import { AppConfigService } from '@app/config';
 import { Injectable } from '@nestjs/common';
 
-const ClientData = {
+export const ClientData = {
   airforce: {
     org_logo: 'logo-airforce.png',
     title: 'Air Force',
@@ -17,6 +17,16 @@ const ClientData = {
     title: 'CAMCOKW',
     description: 'CAMCOKW GLOBAL',
   },
+  demo: {
+    org_logo: 'logo-demo.png',
+    title: 'Edlore',
+    description: 'Maintenance Intelligence at Your Fingertips',
+  },
+  ncms: {
+    org_logo: 'logo-ncms.png',
+    title: 'NCMS',
+    description: 'Office of NAVAL Research (ONR)',
+  },
 };
 
 @Injectable()
@@ -30,7 +40,6 @@ export class OrganizationService {
 
   logo() {
     const { client } = this.configService.getClient();
-    console.log("====================",client)
     const clientData = ClientData[client.toLowerCase()];
     return {
       ...clientData,

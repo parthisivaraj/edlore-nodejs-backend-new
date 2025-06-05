@@ -21,8 +21,8 @@ export class Anaglyph extends BaseEntity {
   @Column({ length: 150, nullable: false })
   title: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: false })
-  status: string;
+  @Column({ nullable: false, default: 1 })
+  status: number;
 
   @ManyToOne(() => Model, (model) => model.anaglyphs, {
     nullable: false,
@@ -42,6 +42,7 @@ export class Anaglyph extends BaseEntity {
 
   @OneToOne(() => Section, (section) => section.anaglyphs, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   @JoinColumn({ name: 'section_id' })
   section: Section;

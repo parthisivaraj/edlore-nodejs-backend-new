@@ -252,7 +252,7 @@ export class SketchService {
       data.title,
       {
         sketch_type: data.sketch_type,
-        model_id: modelId,
+        model: { id: modelId },
       },
     );
     if (duplicateTitle) {

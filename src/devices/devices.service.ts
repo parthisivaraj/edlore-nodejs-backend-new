@@ -23,6 +23,7 @@ import { DeviceSearchParams } from './dto/seach';
 import { FilterService } from '@app/schema/service';
 import { MediaService } from 'src/media/media.service';
 import { ModelResponseDto } from 'src/model/dto/model';
+import { AppConfigService } from '@app/config';
 
 @Injectable()
 export class DeviceService {
@@ -35,6 +36,7 @@ export class DeviceService {
 
     private filterService: FilterService,
     private mediaService: MediaService,
+    private configService: AppConfigService,
   ) {}
 
   async get(params: DeviceSearchParams): Promise<DeviceResponse> {
@@ -211,9 +213,25 @@ export class DeviceService {
     };
   }
 
-  async create(data: CreateDeviceDto) {
+  async create(data: CreateDeviceDto, image: any) {
     const device = this.deviceRepository.create(data);
-    return await this.deviceRepository.save(device);
+    const saveDevice = await this.deviceRepository.save(device);
+    const machineInfo = this.configService.getMachineInfo();
+
+    if (image) {
+      await this.mediaService.saveMedia(
+        image,
+        {
+          media_title: data.name,
+          media_type: 'image',
+          name: 'image',
+          record_id: saveDevice.id,
+          record_type: 'Device',
+        },
+        machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon',
+      );
+    }
+    return saveDevice;
   }
 
   async update(id: string, data: UpdateDeviceDto, image: Express.Multer.File) {
@@ -226,18 +244,25 @@ export class DeviceService {
       throw new NotFoundException(`Device with ID ${id} not found`);
     }
 
-    const { generate_qr, ...filteredData } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { generate_qr: _, ...filteredData } = data;
 
     const deviceName = data.name || device.name;
     if (image) {
+      const machineInfo = this.configService.getMachineInfo();
+
       await this.attachmentRepository.remove(device.attachedMedia);
-      const attached_media = await this.mediaService.saveMedia(image, {
-        media_title: deviceName,
-        media_type: 'image',
-        name: 'image',
-        record_id: device.id,
-        record_type: 'Device',
-      });
+      await this.mediaService.saveMedia(
+        image,
+        {
+          media_title: deviceName,
+          media_type: 'image',
+          name: 'image',
+          record_id: device.id,
+          record_type: 'Device',
+        },
+        machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon',
+      );
     }
 
     await this.deviceRepository.update(id, filteredData);
@@ -258,10 +283,18 @@ export class DeviceService {
   }
 
   async remove(id: string) {
+    const device = await this.deviceRepository.findOne({ where: { id } });
+    if (!device) {
+      throw new NotFoundException(`Device with ID ${id} not found`);
+    }
     const result = await this.deviceRepository.delete(id);
     if (!result.affected) {
       throw new NotFoundException(`Device with ID ${id} not found`);
     }
-    return result;
+    return {
+      message: 'Device deleted successfully',
+      model_id: device.model_id.id,
+      name: device.name,
+    };
   }
 }

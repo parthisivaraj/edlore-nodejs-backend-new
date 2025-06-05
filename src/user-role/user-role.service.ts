@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Permission, Role, RolePermissions, User } from '@app/schema';
+import { Role, RolePermissions, User } from '@app/schema';
 import {
   CreateUserRoleDto,
   UserRoleResponse,
@@ -19,9 +19,8 @@ export class UserRoleService {
 
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
-    @InjectRepository(Permission)
-    private readonly permissionRepository: Repository<Permission>,
-
+    @InjectRepository(RolePermissions)
+    private readonly rolePermissionRepository: Repository<RolePermissions>,
     private filterService: FilterService,
   ) {}
 
@@ -140,42 +139,29 @@ export class UserRoleService {
   async create(
     createUserRoleDto: CreateUserRoleDto,
   ): Promise<UserRoleResponseDto> {
-    const { title, description, permissions } = createUserRoleDto;
+    const {
+      title,
+      description,
+      role_permissions_attributes: permissions,
+    } = createUserRoleDto;
     const newRole = this.roleRepository.create({
       title,
       description,
       role_permissions: permissions.map((permissionId) => ({
-        permission: { id: permissionId },
+        permission: { id: permissionId.permission_id },
       })),
     });
     await this.roleRepository.save(newRole);
-    const rolePermissions = await Promise.all(
+    await Promise.all(
       permissions.map(async (permissionId) => {
-        const permission = await this.permissionRepository.findOne({
-          where: { id: permissionId },
-        });
-
-        if (!permission) {
-          throw new NotFoundException(
-            `Permission with ID ${permissionId} not found`,
-          );
-        }
-
-        return {
-          permission,
-          created_at: DateUtilsService.dateToString(permission.created_at),
-        };
+        const rolePermissionEntity = new RolePermissions();
+        rolePermissionEntity.permission_id = permissionId.permission_id;
+        rolePermissionEntity.role = newRole;
+        await this.rolePermissionRepository.save(rolePermissionEntity);
       }),
     );
-    newRole.role_permissions = rolePermissions.map((rolePermission) => {
-      const rolePermissionEntity = new RolePermissions();
-      rolePermissionEntity.permission = rolePermission.permission;
-      rolePermissionEntity.role = newRole;
-      return rolePermissionEntity;
-    });
-
-    await this.roleRepository.save(newRole);
-    return this.convertToDTO(newRole);
+    const role = await this.getById(newRole.id);
+    return role;
   }
 
   async update(
@@ -193,29 +179,22 @@ export class UserRoleService {
 
     role.title = updateUserRoleDto.title;
     role.description = updateUserRoleDto.description;
-    role.role_permissions = await Promise.all(
-      updateUserRoleDto.permissions.map(async (permissionId) => {
-        const permission = await this.permissionRepository.findOne({
-          where: { id: permissionId },
-        });
-
-        if (!permission) {
-          throw new NotFoundException(
-            `Permission with ID ${permissionId} not found`,
-          );
-        }
-
-        const rolePermission = new RolePermissions();
-        rolePermission.permission = permission;
-        rolePermission.role = role;
-        rolePermission.role_id = role.id;
-        rolePermission.permission_id = permissionId;
-
-        return rolePermission;
-      }),
-    );
     await this.roleRepository.save(role);
+    await this.rolePermissionRepository.delete({
+      role_id: role.id,
+    });
+    await Promise.all(
+      updateUserRoleDto.role_permissions_attributes.map(
+        async (permissionId) => {
+          const rolePermission = new RolePermissions();
+          rolePermission.role_id = role.id;
+          rolePermission.permission_id = permissionId.permission_id;
+          await this.rolePermissionRepository.save(rolePermission);
+        },
+      ),
+    );
 
-    return this.convertToDTO(role);
+    const roleResult = await this.getById(role.id);
+    return roleResult;
   }
 }

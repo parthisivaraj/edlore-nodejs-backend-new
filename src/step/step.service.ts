@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { MediaService } from 'src/media/media.service';
 import { AddStepDTO } from './dto/add-edit';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AppConfigService } from '@app/config';
 
 @Injectable()
 export class StepService {
@@ -13,6 +14,7 @@ export class StepService {
 
     @InjectRepository(Step)
     private readonly stepRepository: Repository<Step>,
+    private configService: AppConfigService,
   ) {}
 
   private async converToStepDTO(step: Step) {
@@ -47,6 +49,7 @@ export class StepService {
         title: data.title,
       });
       await this.stepRepository.save(step);
+      const machineInfo = this.configService.getMachineInfo();
 
       if (files && files['medias[]']) {
         const uploadedFiles = files['medias[]'] || [];
@@ -64,6 +67,7 @@ export class StepService {
               mediable_type: 'Step',
             },
             org_id,
+            machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon',
           );
         }
       }

@@ -192,11 +192,9 @@ export class ProcedureService {
       Procedure,
       'name',
       data.name,
-      {
-        model_id: {
-          id: modelId,
-        },
-      },
+      // {
+      //   model_id: modelId,
+      // },
     );
     if (duplicateTitle) {
       throw new BadRequestException({ error: 'Title should be unique' });

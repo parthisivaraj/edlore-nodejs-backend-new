@@ -8,12 +8,12 @@ interface IMachineType {
 }
 
 interface IClientType {
-  client: 'AIRFORCE' | 'NAVSEA' | 'CAMCOKW';
+  client: 'AIRFORCE' | 'NAVSEA' | 'CAMCOKW' | 'DEMO' | 'NCMS';
 }
 
 @Injectable()
 export class AppConfigService {
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) { }
 
   public getTypeOrmConfig(): TypeOrmModuleOptions {
     return {
@@ -36,6 +36,12 @@ export class AppConfigService {
   public isProduction() {
     const mode = this.getNodeENV().nodeEnv;
     return mode != 'DEV';
+  }
+
+  public getPort() {
+    return {
+      port: this.configService.get('PORT'),
+    };
   }
 
   public getNodeENV() {
@@ -86,6 +92,18 @@ export class AppConfigService {
       region: this.configService.get('AWS_REGION'),
       bucket: this.configService.get('AWS_S3_BUCKET'),
       frontEndURL: this.configService.get('FRONTEND_URL'),
+    };
+  }
+
+  public getMailerConfig() {
+    return {
+      username: this.configService.get('SMTP_USER_NAME'),
+      password: this.configService.get('SMTP_PASSWORD'),
+      address: this.configService.get('SMTP_ADDRESS'),
+      port: this.configService.get('SMTP_PORT'),
+      from: this.configService.get('MAILER_FROM'),
+      media_domain: this.configService.get('MAILER_MEDIA_DOMAIN'),
+      login_domain: this.configService.get('LOGIN_DOMAIN'),
     };
   }
 }

@@ -10,7 +10,8 @@
         "include": "../public",
         "outDir": "dist/public",
         "watchAssets": true
-      }
+      },
+      "mailer/templates/**/*"
     ],
     "watchAssets": true
   },

@@ -308,6 +308,11 @@ let AppConfigService = class AppConfigService {
         const mode = this.getNodeENV().nodeEnv;
         return mode != 'DEV';
     }
+    getPort() {
+        return {
+            port: this.configService.get('PORT'),
+        };
+    }
     getNodeENV() {
         return {
             nodeEnv: this.configService.get('NODE_ENV'),
@@ -349,6 +354,17 @@ let AppConfigService = class AppConfigService {
             region: this.configService.get('AWS_REGION'),
             bucket: this.configService.get('AWS_S3_BUCKET'),
             frontEndURL: this.configService.get('FRONTEND_URL'),
+        };
+    }
+    getMailerConfig() {
+        return {
+            username: this.configService.get('SMTP_USER_NAME'),
+            password: this.configService.get('SMTP_PASSWORD'),
+            address: this.configService.get('SMTP_ADDRESS'),
+            port: this.configService.get('SMTP_PORT'),
+            from: this.configService.get('MAILER_FROM'),
+            media_domain: this.configService.get('MAILER_MEDIA_DOMAIN'),
+            login_domain: this.configService.get('LOGIN_DOMAIN'),
         };
     }
 };
@@ -777,8 +793,8 @@ __decorate([
     __metadata("design:type", String)
 ], Anaglyph.prototype, "title", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 20, nullable: false }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ nullable: false, default: 1 }),
+    __metadata("design:type", Number)
 ], Anaglyph.prototype, "status", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => model_entity_1.Model, (model) => model.anaglyphs, {
@@ -802,6 +818,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.OneToOne)(() => section_entity_1.Section, (section) => section.anaglyphs, {
         onDelete: 'CASCADE',
+        eager: true,
     }),
     (0, typeorm_1.JoinColumn)({ name: 'section_id' }),
     __metadata("design:type", typeof (_b = typeof section_entity_1.Section !== "undefined" && section_entity_1.Section) === "function" ? _b : Object)
@@ -1792,6 +1809,7 @@ __exportStar(__webpack_require__(/*! ./realise-note.entity */ "./libs/schema/src
 __exportStar(__webpack_require__(/*! ./database.entity */ "./libs/schema/src/model/database.entity.ts"), exports);
 __exportStar(__webpack_require__(/*! ./media.entity */ "./libs/schema/src/model/media.entity.ts"), exports);
 __exportStar(__webpack_require__(/*! ./part-notes.entity */ "./libs/schema/src/model/part-notes.entity.ts"), exports);
+__exportStar(__webpack_require__(/*! ./part-fields.entity */ "./libs/schema/src/model/part-fields.entity.ts"), exports);
 
 
 /***/ }),
@@ -2291,6 +2309,40 @@ exports.OTP = OTP = __decorate([
 
 /***/ }),
 
+/***/ "./libs/schema/src/model/part-fields.entity.ts":
+/*!*****************************************************!*\
+  !*** ./libs/schema/src/model/part-fields.entity.ts ***!
+  \*****************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFields = void 0;
+const typeorm_1 = __webpack_require__(/*! typeorm */ "typeorm");
+const base_entity_1 = __webpack_require__(/*! ./base.entity */ "./libs/schema/src/model/base.entity.ts");
+let PartFields = class PartFields extends base_entity_1.BaseEntityWithoutDelete {
+};
+exports.PartFields = PartFields;
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 255 }),
+    __metadata("design:type", String)
+], PartFields.prototype, "name", void 0);
+exports.PartFields = PartFields = __decorate([
+    (0, typeorm_1.Entity)('part_fields')
+], PartFields);
+
+
+/***/ }),
+
 /***/ "./libs/schema/src/model/part-notes.entity.ts":
 /*!****************************************************!*\
   !*** ./libs/schema/src/model/part-notes.entity.ts ***!
@@ -2406,6 +2458,14 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: false }),
     __metadata("design:type", Number)
 ], Part.prototype, "quantity", void 0);
+__decorate([
+    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    __metadata("design:type", Object)
+], Part.prototype, "dynamic_fields", void 0);
+__decorate([
+    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    __metadata("design:type", Object)
+], Part.prototype, "part_fields", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => anaglyph_entity_1.Anaglyph, (anaglyph) => anaglyph.parts),
     (0, typeorm_1.JoinColumn)({ name: 'anaglyph_id' }),
@@ -4056,6 +4116,7 @@ exports.DBSchemas = {
     realiseNote: typeorm_1.TypeOrmModule.forFeature([model_1.RealiseNoteEntity]),
     database: typeorm_1.TypeOrmModule.forFeature([model_1.Database]),
     partNotes: typeorm_1.TypeOrmModule.forFeature([model_1.PartNotes]),
+    partFields: typeorm_1.TypeOrmModule.forFeature([model_1.PartFields]),
 };
 let SchemaModule = class SchemaModule {
 };
@@ -4124,6 +4185,7 @@ exports.SchemaModule = SchemaModule = __decorate([
                         model_1.RealiseNoteEntity,
                         model_1.Database,
                         model_1.PartNotes,
+                        model_1.PartFields,
                     ],
                 }),
             }),
@@ -4833,6 +4895,9 @@ let AnaglyphController = class AnaglyphController {
     async getPartNoteById(modelId, partId, noteId) {
         return await this.anaglyphService.getPartNoteById(modelId, partId, noteId);
     }
+    async getCSVUpload() {
+        return;
+    }
     async getByPartId(partId) {
         return await this.anaglyphService.getByPartId(partId);
     }
@@ -4983,6 +5048,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AnaglyphController.prototype, "getPartNoteById", null);
 __decorate([
+    (0, common_1.Get)('/anaglyph/:id/parts/csv_upload_status'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AnaglyphController.prototype, "getCSVUpload", null);
+__decorate([
     (0, common_1.Get)('/anaglyph/:id/parts/:partId'),
     __param(0, (0, common_1.Param)('partId')),
     __metadata("design:type", Function),
@@ -5131,6 +5202,7 @@ exports.AnaglyphModule = AnaglyphModule = __decorate([
             schema_1.DBSchemas.note,
             schema_1.DBSchemas.partNotes,
             schema_1.DBSchemas.attachedMedia,
+            schema_1.DBSchemas.partFields,
             media_1.MediaModule,
         ],
         providers: [anaglyph_service_1.AnaglyphService],
@@ -5161,7 +5233,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AnaglyphService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -5174,18 +5246,29 @@ const csv = __webpack_require__(/*! csv-parser */ "csv-parser");
 const anaglyph_1 = __webpack_require__(/*! ./dto/anaglyph */ "./src/anaglyph/dto/anaglyph.ts");
 const media_service_1 = __webpack_require__(/*! src/media/media.service */ "./src/media/media.service.ts");
 const service_1 = __webpack_require__(/*! @app/schema/service */ "./libs/schema/src/service/index.ts");
+const axios_1 = __webpack_require__(/*! axios */ "axios");
 let AnaglyphService = class AnaglyphService {
-    constructor(anaglyphRepository, partRepository, partNotesRepository, noteRepository, modelRepository, attachedMediaRepository, dataSource, mediaService, customUniqueService, commonStepService) {
+    constructor(anaglyphRepository, partRepository, partNotesRepository, noteRepository, modelRepository, attachedMediaRepository, partFieldsRepository, dataSource, mediaService, customUniqueService, commonStepService) {
         this.anaglyphRepository = anaglyphRepository;
         this.partRepository = partRepository;
         this.partNotesRepository = partNotesRepository;
         this.noteRepository = noteRepository;
         this.modelRepository = modelRepository;
         this.attachedMediaRepository = attachedMediaRepository;
+        this.partFieldsRepository = partFieldsRepository;
         this.dataSource = dataSource;
         this.mediaService = mediaService;
         this.customUniqueService = customUniqueService;
         this.commonStepService = commonStepService;
+        this.partsFieldsArrayCreate = (row, partsFieldsArray, partsFieldsNames) => {
+            return partsFieldsArray.map((item, index) => {
+                return {
+                    id: item.id,
+                    name: item.name,
+                    value: row[item.name]
+                };
+            });
+        };
     }
     async convertToDTO(anaglyph) {
         const response = new anaglyph_1.AnaglyphResponseDto();
@@ -5249,6 +5332,19 @@ let AnaglyphService = class AnaglyphService {
         }
         return response;
     }
+    convertToNewPartFields(partFields) {
+        const dto = new anaglyph_1.PartFieldsDTO();
+        dto.id = partFields.id;
+        dto.name = partFields.name;
+        return dto;
+    }
+    async convertToPartFieldsDTO(partField) {
+        const temp = {
+            id: partField.id,
+            name: partField.name
+        };
+        return temp;
+    }
     async convertToPartDTO(part) {
         const temp = {
             id: part.id,
@@ -5265,6 +5361,8 @@ let AnaglyphService = class AnaglyphService {
             part_name: part.part_name,
             purchase_url: part.purchase_url,
             quantity: part.quantity,
+            dynamic_fields: part.dynamic_fields,
+            part_fields: part.part_fields,
         };
         return temp;
     }
@@ -5329,7 +5427,16 @@ let AnaglyphService = class AnaglyphService {
             .andWhere('parts.anaglyph_id = :id', { id });
         if (params.search) {
             const escapedKeyword = params.search.replace(/[!@#$%^&*()\-=\[\]{}|;:,./<>?\\']/g, '\\$&');
-            queryBuilder = queryBuilder.andWhere("(LOWER(parts.part_name) LIKE LOWER(:search) ESCAPE '\\' OR LOWER(parts.layer_id::text) LIKE LOWER(:search) ESCAPE '\\' OR LOWER(parts.manufacturer_code) LIKE LOWER(:search) ESCAPE '\\' OR LOWER(parts.nomenclature) LIKE LOWER(:search) ESCAPE '\\' OR LOWER(parts.nsn_number) LIKE LOWER(:search) ESCAPE '\\' OR LOWER(parts.part_description) LIKE LOWER(:search) ESCAPE '\\')", { search: `%${escapedKeyword}%` });
+            queryBuilder = queryBuilder.andWhere(`(
+        LOWER(parts.part_name) LIKE LOWER(:search) ESCAPE '\\' OR
+        LOWER(parts.layer_id::text) LIKE LOWER(:search) ESCAPE '\\' OR
+        LOWER(parts.part_description) LIKE LOWER(:search) ESCAPE '\\' OR
+        EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(parts.part_fields) AS elem
+          WHERE LOWER(elem->>'value') LIKE LOWER(:search) ESCAPE '\\'
+        )
+      )`, { search: `%${escapedKeyword}%` });
         }
         const take = params.limit || 10;
         const skip = (params.page - 1) * take;
@@ -5373,9 +5480,7 @@ let AnaglyphService = class AnaglyphService {
             });
         }
         const duplicateTitle = await this.customUniqueService.isExist(schema_1.Anaglyph, 'title', data.title, {
-            model: {
-                id: modelId,
-            },
+            model: { id: modelId },
         });
         if (duplicateTitle) {
             throw new common_1.BadRequestException({ error: 'Title should be unique' });
@@ -5385,10 +5490,11 @@ let AnaglyphService = class AnaglyphService {
                 section: {
                     id: data.section_id,
                 },
+                is_deleted: false,
             },
         });
-        if (!sectionHasAnalyph) {
-            throw new common_1.HttpException({ message: 'The given section is associated with another 3D file' }, common_1.HttpStatus.BAD_REQUEST);
+        if (sectionHasAnalyph) {
+            throw new common_1.BadRequestException('The given section is associated with another 3D file');
         }
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -5405,9 +5511,7 @@ let AnaglyphService = class AnaglyphService {
             await this.commonStepService.saveAttachedMedia(queryRunner, [data.anaglyph_file_attributes], anaglyph.id, 'Anaglyph', 'zip_file');
             await queryRunner.commitTransaction();
             const response = await this.getById(anaglyph.id);
-            return {
-                anaglyph: response,
-            };
+            return response;
         }
         catch (error) {
             await queryRunner.rollbackTransaction();
@@ -5434,10 +5538,11 @@ let AnaglyphService = class AnaglyphService {
                         section: {
                             id: data.section_id,
                         },
+                        is_deleted: false,
                     },
                 });
-                if (!sectionHasAnalyph) {
-                    throw new common_1.HttpException({ message: 'The given section is associated with another 3D file' }, common_1.HttpStatus.CONFLICT);
+                if (sectionHasAnalyph) {
+                    throw new common_1.BadRequestException('The given section is associated with another 3D file');
                 }
                 Object.assign(anaglyph, {
                     section: data.section_id,
@@ -5445,7 +5550,7 @@ let AnaglyphService = class AnaglyphService {
             }
             if (data.title) {
                 Object.assign(anaglyph, {
-                    name: data.title,
+                    title: data.title,
                 });
             }
             if (data.purchase_link) {
@@ -5459,10 +5564,7 @@ let AnaglyphService = class AnaglyphService {
             }
             await queryRunner.commitTransaction();
             const response = await this.getById(anaglyph.id);
-            return {
-                anaglyph: response,
-                message: 'Anaglyph Updated Successfully',
-            };
+            return response;
         }
         catch (error) {
             await queryRunner.rollbackTransaction();
@@ -5892,71 +5994,77 @@ let AnaglyphService = class AnaglyphService {
     async startUploading(anaglyphId, filePath) {
         try {
             const results = [];
-            fs.createReadStream(filePath)
-                .pipe(csv())
-                .on('data', (data) => {
-                results.push(data);
-            })
-                .on('end', async () => {
-                const queryRunner = this.dataSource.createQueryRunner();
-                await queryRunner.connect();
-                await queryRunner.startTransaction();
-                try {
-                    const anaglyph = await this.anaglyphRepository.findOne({
-                        where: { id: anaglyphId },
-                    });
-                    if (!anaglyph) {
-                        throw new common_1.BadRequestException({
-                            error: `Anaglyph with ID ${anaglyphId} not found`,
+            let stream;
+            if (/^https?:\/\//.test(filePath)) {
+                const response = await axios_1.default.get(filePath, { responseType: 'stream' });
+                stream = response.data;
+            }
+            else {
+                stream = fs.createReadStream(filePath);
+            }
+            return new Promise((resolve, reject) => {
+                stream
+                    .pipe(csv())
+                    .on('data', (data) => results.push(data))
+                    .on('end', async () => {
+                    const queryRunner = this.dataSource.createQueryRunner();
+                    await queryRunner.connect();
+                    await queryRunner.startTransaction();
+                    try {
+                        const anaglyph = await this.anaglyphRepository.findOne({
+                            where: { id: anaglyphId },
                         });
-                    }
-                    for (const record of results) {
-                        const existingPart = await queryRunner.manager.findOne(schema_1.Part, {
-                            where: {
-                                layer_id: record['layer_id*'],
-                                anaglyph: anaglyph,
-                            },
-                        });
-                        if (existingPart) {
-                            existingPart.part_name = record['part_name*'];
-                            existingPart.part_id = record['part_id*'];
-                            existingPart.part_description = record['part_description'];
-                            existingPart.purchase_url = record['purchase_url'];
-                            existingPart.nsn_number = record['nsn_number'];
-                            existingPart.nomenclature = record['nomenclature'];
-                            existingPart.manufacturer_code = record['mfr_code'];
-                            existingPart.quantity = record['quantity']
-                                ? Number(record['quantity'])
-                                : 0;
-                            await queryRunner.manager.save(existingPart);
-                        }
-                        else {
-                            const part = queryRunner.manager.create(schema_1.Part, {
-                                part_name: record['part_name*'],
-                                part_id: record['part_id*'],
-                                layer_id: record['layer_id*'],
-                                part_description: record['part_description'],
-                                purchase_url: record['purchase_url'],
-                                nsn_number: record['nsn_number'],
-                                nomenclature: record['nomenclature'],
-                                manufacturer_code: record['mfr_code'],
-                                quantity: record['quantity'] ? Number(record['quantity']) : 0,
-                                anaglyph: anaglyph,
+                        const partFields = await this.partFieldsRepository.find();
+                        const partsFieldsArray = partFields.map((partfield) => this.convertToNewPartFields(partfield));
+                        const partsFieldsNames = partsFieldsArray.map(item => item.name);
+                        if (!anaglyph) {
+                            throw new common_1.BadRequestException({
+                                error: `Anaglyph with ID ${anaglyphId} not found`,
                             });
-                            await queryRunner.manager.save(part);
                         }
+                        for (const record of results) {
+                            const existingPart = await queryRunner.manager.findOne(schema_1.Part, {
+                                where: {
+                                    layer_id: record['layer_id*'],
+                                    anaglyph: anaglyph,
+                                },
+                            });
+                            if (existingPart) {
+                                existingPart.part_name = record['part_name*'];
+                                existingPart.part_id = record['part_id*'];
+                                existingPart.part_description = record['part_description'];
+                                existingPart.purchase_url = record['purchase_url'];
+                                const partsFields = this.partsFieldsArrayCreate(record, partsFieldsArray, partsFieldsNames);
+                                existingPart.part_fields = partsFields;
+                                queryRunner.manager.save(existingPart);
+                            }
+                            else {
+                                const partsFields = this.partsFieldsArrayCreate(record, partsFieldsArray, partsFieldsNames);
+                                const part = queryRunner.manager.create(schema_1.Part, {
+                                    part_name: record['part_name*'],
+                                    part_id: record['part_id*'],
+                                    layer_id: record['layer_id*'],
+                                    part_description: record['part_description'],
+                                    purchase_url: record['purchase_url'],
+                                    anaglyph: anaglyph,
+                                    part_fields: partsFields,
+                                });
+                                await queryRunner.manager.save(part);
+                            }
+                        }
+                        await queryRunner.commitTransaction();
                     }
-                    await queryRunner.commitTransaction();
-                }
-                catch (error) {
-                    await queryRunner.rollbackTransaction();
-                    throw error;
-                }
-                finally {
-                    await queryRunner.release();
-                }
+                    catch (error) {
+                        await queryRunner.rollbackTransaction();
+                        throw error;
+                    }
+                    finally {
+                        await queryRunner.release();
+                    }
+                    resolve({ message: 'File uploaded successfully', status: 200 });
+                })
+                    .on('error', (err) => reject(err));
             });
-            return { message: 'File uploaded successfully', status: 200 };
         }
         catch (error) {
             console.error('Error during CSV upload', error);
@@ -5973,7 +6081,8 @@ exports.AnaglyphService = AnaglyphService = __decorate([
     __param(3, (0, typeorm_1.InjectRepository)(schema_1.Note)),
     __param(4, (0, typeorm_1.InjectRepository)(schema_1.Model)),
     __param(5, (0, typeorm_1.InjectRepository)(schema_1.AttachedMedia)),
-    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _c : Object, typeof (_d = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _d : Object, typeof (_e = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _e : Object, typeof (_f = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _f : Object, typeof (_g = typeof typeorm_2.DataSource !== "undefined" && typeorm_2.DataSource) === "function" ? _g : Object, typeof (_h = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _h : Object, typeof (_j = typeof service_1.CustomUniqueService !== "undefined" && service_1.CustomUniqueService) === "function" ? _j : Object, typeof (_k = typeof service_1.CommonStepService !== "undefined" && service_1.CommonStepService) === "function" ? _k : Object])
+    __param(6, (0, typeorm_1.InjectRepository)(schema_1.PartFields)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _c : Object, typeof (_d = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _d : Object, typeof (_e = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _e : Object, typeof (_f = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _f : Object, typeof (_g = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _g : Object, typeof (_h = typeof typeorm_2.DataSource !== "undefined" && typeorm_2.DataSource) === "function" ? _h : Object, typeof (_j = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _j : Object, typeof (_k = typeof service_1.CustomUniqueService !== "undefined" && service_1.CustomUniqueService) === "function" ? _k : Object, typeof (_l = typeof service_1.CommonStepService !== "undefined" && service_1.CommonStepService) === "function" ? _l : Object])
 ], AnaglyphService);
 
 
@@ -6119,7 +6228,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PartDTO = exports.AnaglyphDetailDTO = exports.AnaglyphDetailResponseDTO = exports.AnaglyphResponse = exports.AnaglyphResponseDto = exports.ThumbUrlDisplayDto = exports.SectionDto = void 0;
+exports.PartFieldsResponseDTO = exports.PartFieldsDTO = exports.PartDTO = exports.AnaglyphDetailDTO = exports.AnaglyphDetailResponseDTO = exports.AnaglyphResponse = exports.AnaglyphResponseDto = exports.ThumbUrlDisplayDto = exports.SectionDto = void 0;
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class SectionDto {
 }
@@ -6198,6 +6307,12 @@ exports.AnaglyphDetailDTO = AnaglyphDetailDTO;
 class PartDTO {
 }
 exports.PartDTO = PartDTO;
+class PartFieldsDTO {
+}
+exports.PartFieldsDTO = PartFieldsDTO;
+class PartFieldsResponseDTO {
+}
+exports.PartFieldsResponseDTO = PartFieldsResponseDTO;
 
 
 /***/ }),
@@ -6287,6 +6402,8 @@ const permission_module_1 = __webpack_require__(/*! ./permission/permission.modu
 const step_1 = __webpack_require__(/*! ./step */ "./src/step/index.ts");
 const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
 const response_interceptor_service_1 = __webpack_require__(/*! ./response-interceptor.service */ "./src/response-interceptor.service.ts");
+const mail_module_1 = __webpack_require__(/*! ./mailer/mail.module */ "./src/mailer/mail.module.ts");
+const part_fields_1 = __webpack_require__(/*! ./part-fields */ "./src/part-fields/index.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -6300,6 +6417,7 @@ exports.AppModule = AppModule = __decorate([
             schedule_1.ScheduleModule.forRoot(),
             config_1.AppConfigModule,
             schema_1.SchemaModule,
+            mail_module_1.MailModule,
             health_1.HealthModule,
             organization_1.OrganizationModule,
             auth_1.AuthModule,
@@ -6339,6 +6457,7 @@ exports.AppModule = AppModule = __decorate([
             sync_module_1.SyncModule,
             step_1.StepModule,
             realise_note_1.RealiseNoteModule,
+            part_fields_1.PartFieldsModule,
         ],
         controllers: [],
         providers: [
@@ -6824,7 +6943,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -6893,8 +7012,19 @@ let AuthController = class AuthController {
     async resetPassword(resetPasswordDto) {
         return await this.authService.resetPassword(resetPasswordDto);
     }
-    async verifyOTP({ email, otp }) {
+    async getOTP(email) {
+        return await this.authService.getOtp(email);
+    }
+    async verifyOTP(email, otp) {
         return await this.authService.verifyOTP(email, otp);
+    }
+    async resetfForgotPassword(email, otp, password, password_confirmation) {
+        try {
+            return await this.authService.forgotPasswordReset(email, otp, password, password_confirmation);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException(error.message);
+        }
     }
     async storeHashedPassword() {
         const password = 'Test!123';
@@ -6949,6 +7079,7 @@ __decorate([
 ], AuthController.prototype, "twoFactorResendOTP", null);
 __decorate([
     (0, common_1.Post)('forgot_password_reset'),
+    (0, common_utils_1.Public)(),
     (0, common_1.HttpCode)(200),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -6982,13 +7113,34 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "resetPassword", null);
 __decorate([
-    (0, common_1.Post)('verify_otp'),
-    (0, common_1.HttpCode)(200),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Get)('get_opt'),
+    (0, common_utils_1.Public)(),
+    __param(0, (0, common_1.Query)('email')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getOTP", null);
+__decorate([
+    (0, common_1.Post)('verify_otp'),
+    (0, common_utils_1.Public)(),
+    (0, common_1.HttpCode)(200),
+    __param(0, (0, common_1.Query)('email')),
+    __param(1, (0, common_1.Query)('otp')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "verifyOTP", null);
+__decorate([
+    (0, common_1.Post)('reset_forgot_password'),
+    (0, common_utils_1.Public)(),
+    __param(0, (0, common_1.Body)('email')),
+    __param(1, (0, common_1.Body)('otp')),
+    __param(2, (0, common_1.Body)('password')),
+    __param(3, (0, common_1.Body)('password_confirmation')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String, String]),
+    __metadata("design:returntype", typeof (_k = typeof Promise !== "undefined" && Promise) === "function" ? _k : Object)
+], AuthController.prototype, "resetfForgotPassword", null);
 __decorate([
     (0, common_1.Get)('store_hashed_password'),
     (0, common_utils_1.Public)(),
@@ -7029,6 +7181,7 @@ const jwt_auth_guard_1 = __webpack_require__(/*! ./jwt-auth.guard */ "./src/auth
 const config_1 = __webpack_require__(/*! @app/config */ "./libs/config/src/index.ts");
 const jwt_strategy_1 = __webpack_require__(/*! ./jwt.strategy */ "./src/auth/jwt.strategy.ts");
 const media_1 = __webpack_require__(/*! src/media */ "./src/media/index.ts");
+const mail_module_1 = __webpack_require__(/*! src/mailer/mail.module */ "./src/mailer/mail.module.ts");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -7039,6 +7192,7 @@ exports.AuthModule = AuthModule = __decorate([
             schema_1.DBSchemas.otp,
             schema_1.DBSchemas.deviceToken,
             media_1.MediaModule,
+            mail_module_1.MailModule,
             jwt_1.JwtModule.registerAsync({
                 inject: [config_1.AppConfigService],
                 useFactory: async (configService) => {
@@ -7076,7 +7230,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthService = void 0;
 const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
@@ -7088,14 +7242,17 @@ const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
 const crypto = __webpack_require__(/*! crypto */ "crypto");
 const config_1 = __webpack_require__(/*! @app/config */ "./libs/config/src/index.ts");
 const media_1 = __webpack_require__(/*! src/media */ "./src/media/index.ts");
+const organization_service_1 = __webpack_require__(/*! src/organization/organization.service */ "./src/organization/organization.service.ts");
+const mailer_1 = __webpack_require__(/*! @nestjs-modules/mailer */ "@nestjs-modules/mailer");
 let AuthService = class AuthService {
-    constructor(userRepository, otpRepository, deviceTokenRepository, jwtService, configService, mediaService) {
+    constructor(userRepository, otpRepository, deviceTokenRepository, jwtService, configService, mediaService, mailerService) {
         this.userRepository = userRepository;
         this.otpRepository = otpRepository;
         this.deviceTokenRepository = deviceTokenRepository;
         this.jwtService = jwtService;
         this.configService = configService;
         this.mediaService = mediaService;
+        this.mailerService = mailerService;
         const config = this.configService.getAWSConfig();
         this.frontendURL = config.frontEndURL;
     }
@@ -7107,13 +7264,15 @@ let AuthService = class AuthService {
         const role = user.user_roles[0];
         const payload = { sub: user.id, org_id: org.id };
         const accessToken = this.jwtService.sign(payload);
+        const { client } = this.configService.getClient();
+        const clientData = organization_service_1.ClientData[client.toLowerCase()];
         const data = {
             access_token: accessToken,
             org_id: org.id,
             org_name: org.name,
-            org_logo: `${this.frontendURL}/af-logo-300x_a.png`,
-            org_logo_png: `${this.frontendURL}/af-logo-300x_a.png`,
-            org_logo_2x_png: `${this.frontendURL}/af-logo-300x_a.png`,
+            org_logo: `${this.frontendURL}/${clientData.org_logo}`,
+            org_logo_png: `${this.frontendURL}/${clientData.org_logo}`,
+            org_logo_2x_png: `${this.frontendURL}/${clientData.org_logo}`,
             user_name: `${user.first_name} ${user.last_name}`,
             user_profile_image: `${this.frontendURL}/user-default.png`,
             role: role?.role.title || null,
@@ -7139,8 +7298,12 @@ let AuthService = class AuthService {
         if (!isPasswordValid) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
+        const machineInfo = this.configService.getMachineInfo();
         if (fromAdmin) {
-            const otpCode = this.generateNumericOTP();
+            let otpCode = '123456';
+            if (machineInfo.mode === 'ONLINE') {
+                otpCode = this.generateNumericOTP();
+            }
             const token = crypto.randomBytes(16).toString('hex');
             const otp = new schema_1.OTP();
             otp.user = user;
@@ -7153,6 +7316,18 @@ let AuthService = class AuthService {
             }
             catch {
                 throw new common_1.BadRequestException('Error saving OTP to database');
+            }
+            if (machineInfo.mode === 'ONLINE') {
+                await this.mailerService.sendMail({
+                    to: user.email,
+                    subject: 'Check the verfication code for Edlore',
+                    template: './otp.mailer.hbs',
+                    context: {
+                        otp: otpCode,
+                        name: user.first_name,
+                        media_domain: this.configService.getMailerConfig().media_domain,
+                    },
+                });
             }
             console.log(`OTP for ${email}: ${otpCode}`);
             return {
@@ -7213,11 +7388,7 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.BadRequestException('User not found');
         }
-        let otpCode = '123456';
-        const machineInfo = this.configService.getMachineInfo();
-        if (machineInfo.mode === 'ONLINE') {
-            otpCode = this.generateNumericOTP();
-        }
+        const otpCode = '123456';
         const otp = new schema_1.OTP();
         otp.user = user;
         otp.otp = otpCode;
@@ -7300,10 +7471,7 @@ let AuthService = class AuthService {
         if (!otp) {
             throw new common_1.BadRequestException('OTP not found');
         }
-        console.log('Found OTP:', otp);
         const expirationTime = new Date(otp.created_at.getTime() + 24 * 60 * 60 * 1000);
-        console.log('Current server time:', new Date());
-        console.log('OTP expiration time:', expirationTime);
         if (new Date() > expirationTime) {
             console.error(`OTP expired at ${expirationTime}, current time is ${new Date()}`);
             throw new common_1.BadRequestException('Your OTP has expired. Please request a new one.');
@@ -7325,6 +7493,109 @@ let AuthService = class AuthService {
             message: 'Hashed password stored successfully in the database.',
         };
     }
+    async getOtp(email) {
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (!user) {
+            return {
+                statusCode: common_1.HttpStatus.NOT_FOUND,
+                message: 'User Not Found',
+                data: {},
+            };
+        }
+        const machineInfo = this.configService.getMachineInfo();
+        let otpCode = '123456';
+        if (machineInfo.mode === 'ONLINE') {
+            otpCode = this.generateNumericOTP();
+        }
+        const existingOtp = await this.otpRepository.findOne({
+            where: {
+                user: { id: user.id },
+                verification_type: '2FA',
+            },
+            order: { created_at: 'DESC' },
+        });
+        if (existingOtp) {
+            await this.otpRepository.delete(existingOtp.id);
+        }
+        const token = crypto.randomBytes(16).toString('hex');
+        const otp = new schema_1.OTP();
+        otp.user = user;
+        otp.otp = otpCode;
+        otp.created_at = new Date();
+        otp.verification_type = '2FA';
+        otp.token = token;
+        try {
+            await this.otpRepository.save(otp);
+            if (machineInfo.mode === 'ONLINE') {
+                await this.mailerService.sendMail({
+                    to: user.email,
+                    subject: 'Your OTP Code',
+                    template: './forgot-password.mailer.hbs',
+                    context: {
+                        otp: otpCode,
+                        name: user.first_name,
+                        media_domain: this.configService.getMailerConfig().media_domain,
+                    },
+                });
+            }
+            return {
+                statusCode: common_1.HttpStatus.OK,
+                message: 'OTP sent successfully',
+                data: {},
+            };
+        }
+        catch {
+            throw new common_1.BadRequestException('Failed to create OTP.');
+        }
+    }
+    async forgotPasswordReset(email, otp, password, password_confirmation) {
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (!user) {
+            throw new common_1.BadRequestException('User not found');
+        }
+        const userOtp = await this.otpRepository.findOne({
+            where: {
+                user: { id: user.id },
+                verification_type: '2FA',
+            },
+            order: { created_at: 'DESC' },
+        });
+        if (userOtp?.otp === otp) {
+            const otpAge = Date.now() - new Date(userOtp.created_at).getTime();
+            if (otpAge < 300000) {
+                if (password !== password_confirmation) {
+                    throw new common_1.BadRequestException('Password and confirmation password do not match');
+                }
+                try {
+                    user.encrypted_password = await bcrypt.hash(password, 10);
+                    await this.userRepository.save(user);
+                    await this.mailerService.sendMail({
+                        to: user.email,
+                        subject: 'Password Changed Successfully',
+                        template: './password-changed-confirmation.mailer.hbs',
+                        context: {
+                            email: user.email,
+                            name: user.first_name,
+                            password: password,
+                            media_domain: this.configService.getMailerConfig().media_domain,
+                            frontEndDomain: this.configService.getMailerConfig().login_domain,
+                        },
+                    });
+                    return {
+                        statusCode: common_1.HttpStatus.OK,
+                        message: 'Successfully updated the password',
+                        status: true,
+                    };
+                }
+                catch (error) {
+                    throw new common_1.UnprocessableEntityException('Failed! Something went wrong.' + error);
+                }
+            }
+            else {
+                throw new common_1.BadRequestException('OTP Expired.');
+            }
+        }
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
@@ -7332,7 +7603,7 @@ exports.AuthService = AuthService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(schema_1.User)),
     __param(1, (0, typeorm_1.InjectRepository)(schema_1.OTP)),
     __param(2, (0, typeorm_1.InjectRepository)(schema_1.DeviceToken)),
-    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _c : Object, typeof (_d = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _d : Object, typeof (_e = typeof config_1.AppConfigService !== "undefined" && config_1.AppConfigService) === "function" ? _e : Object, typeof (_f = typeof media_1.MediaService !== "undefined" && media_1.MediaService) === "function" ? _f : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _c : Object, typeof (_d = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _d : Object, typeof (_e = typeof config_1.AppConfigService !== "undefined" && config_1.AppConfigService) === "function" ? _e : Object, typeof (_f = typeof media_1.MediaService !== "undefined" && media_1.MediaService) === "function" ? _f : Object, typeof (_g = typeof mailer_1.MailerService !== "undefined" && mailer_1.MailerService) === "function" ? _g : Object])
 ], AuthService);
 
 
@@ -8122,7 +8393,7 @@ let CategoriesService = class CategoriesService {
             .leftJoinAndSelect('category.models', 'model', 'model.is_deleted = :is_deleted', { is_deleted: false })
             .leftJoinAndSelect('category.sub_categories', 'subCategory', 'subCategory.is_deleted = :is_deleted', { is_deleted: false })
             .leftJoinAndSelect('subCategory.models', 'subCategoryModel', 'subCategoryModel.is_deleted = :is_deleted', { is_deleted: false });
-        const take = !params.limit ? undefined : 10;
+        const take = !params.limit ? undefined : params.limit;
         const skip = (params.page - 1) * take;
         const [categories, total] = await queryBuilder
             .skip(skip)
@@ -10226,8 +10497,9 @@ let DeviceController = class DeviceController {
     async getById(id) {
         return await this.deviceService.getById(id);
     }
-    async create(data) {
-        return await this.deviceService.create(data);
+    async create(data, files) {
+        const image = (files || []).find((file) => file.fieldname === 'image');
+        return await this.deviceService.create(data, image);
     }
     async update(id, data, image) {
         try {
@@ -10248,11 +10520,7 @@ let DeviceController = class DeviceController {
         return await this.deviceService.changeStatus(id, data);
     }
     async remove(id) {
-        const result = await this.deviceService.remove(id);
-        if (!result.affected) {
-            throw new common_1.NotFoundException(`Device with ID ${id} not found`);
-        }
-        return { message: 'Device deleted successfully' };
+        return await this.deviceService.remove(id);
     }
 };
 exports.DeviceController = DeviceController;
@@ -10274,8 +10542,9 @@ __decorate([
     (0, common_1.Post)(''),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof devices_1.CreateDeviceDto !== "undefined" && devices_1.CreateDeviceDto) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [typeof (_c = typeof devices_1.CreateDeviceDto !== "undefined" && devices_1.CreateDeviceDto) === "function" ? _c : Object, Array]),
     __metadata("design:returntype", Promise)
 ], DeviceController.prototype, "create", null);
 __decorate([
@@ -10365,7 +10634,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DeviceService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -10377,12 +10646,14 @@ const QRCode = __webpack_require__(/*! qrcode */ "qrcode");
 const service_1 = __webpack_require__(/*! @app/schema/service */ "./libs/schema/src/service/index.ts");
 const media_service_1 = __webpack_require__(/*! src/media/media.service */ "./src/media/media.service.ts");
 const model_1 = __webpack_require__(/*! src/model/dto/model */ "./src/model/dto/model.ts");
+const config_1 = __webpack_require__(/*! @app/config */ "./libs/config/src/index.ts");
 let DeviceService = class DeviceService {
-    constructor(deviceRepository, attachmentRepository, filterService, mediaService) {
+    constructor(deviceRepository, attachmentRepository, filterService, mediaService, configService) {
         this.deviceRepository = deviceRepository;
         this.attachmentRepository = attachmentRepository;
         this.filterService = filterService;
         this.mediaService = mediaService;
+        this.configService = configService;
     }
     async get(params) {
         let queryBuilder = this.deviceRepository
@@ -10521,9 +10792,20 @@ let DeviceService = class DeviceService {
             width: device.width,
         };
     }
-    async create(data) {
+    async create(data, image) {
         const device = this.deviceRepository.create(data);
-        return await this.deviceRepository.save(device);
+        const saveDevice = await this.deviceRepository.save(device);
+        const machineInfo = this.configService.getMachineInfo();
+        if (image) {
+            await this.mediaService.saveMedia(image, {
+                media_title: data.name,
+                media_type: 'image',
+                name: 'image',
+                record_id: saveDevice.id,
+                record_type: 'Device',
+            }, machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon');
+        }
+        return saveDevice;
     }
     async update(id, data, image) {
         const device = await this.deviceRepository.findOne({
@@ -10533,17 +10815,18 @@ let DeviceService = class DeviceService {
         if (!device) {
             throw new common_1.NotFoundException(`Device with ID ${id} not found`);
         }
-        const { generate_qr, ...filteredData } = data;
+        const { generate_qr: _, ...filteredData } = data;
         const deviceName = data.name || device.name;
         if (image) {
+            const machineInfo = this.configService.getMachineInfo();
             await this.attachmentRepository.remove(device.attachedMedia);
-            const attached_media = await this.mediaService.saveMedia(image, {
+            await this.mediaService.saveMedia(image, {
                 media_title: deviceName,
                 media_type: 'image',
                 name: 'image',
                 record_id: device.id,
                 record_type: 'Device',
-            });
+            }, machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon');
         }
         await this.deviceRepository.update(id, filteredData);
         return this.getById(id);
@@ -10561,11 +10844,19 @@ let DeviceService = class DeviceService {
         };
     }
     async remove(id) {
+        const device = await this.deviceRepository.findOne({ where: { id } });
+        if (!device) {
+            throw new common_1.NotFoundException(`Device with ID ${id} not found`);
+        }
         const result = await this.deviceRepository.delete(id);
         if (!result.affected) {
             throw new common_1.NotFoundException(`Device with ID ${id} not found`);
         }
-        return result;
+        return {
+            message: 'Device deleted successfully',
+            model_id: device.model_id.id,
+            name: device.name,
+        };
     }
 };
 exports.DeviceService = DeviceService;
@@ -10573,7 +10864,7 @@ exports.DeviceService = DeviceService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(schema_1.Device)),
     __param(1, (0, typeorm_1.InjectRepository)(schema_1.ActiveStorageAttachment)),
-    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof service_1.FilterService !== "undefined" && service_1.FilterService) === "function" ? _c : Object, typeof (_d = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _d : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof service_1.FilterService !== "undefined" && service_1.FilterService) === "function" ? _c : Object, typeof (_d = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _d : Object, typeof (_e = typeof config_1.AppConfigService !== "undefined" && config_1.AppConfigService) === "function" ? _e : Object])
 ], DeviceService);
 
 
@@ -11528,7 +11819,7 @@ let ErrorCodeService = class ErrorCodeService {
             }
             await queryRunner.commitTransaction();
             const response = await this.getById(errorCode.id);
-            return response;
+            return response.error;
         }
         catch (error) {
             await queryRunner.rollbackTransaction();
@@ -11602,7 +11893,7 @@ let ErrorCodeService = class ErrorCodeService {
                 errorCode: { id },
             });
             await queryRunner.commitTransaction();
-            return { message: 'Deleted Successfully', error: errorCode };
+            return { message: 'Deleted Successfully', title: errorCode.title };
         }
         catch (error) {
             await queryRunner.rollbackTransaction();
@@ -12976,6 +13267,62 @@ __exportStar(__webpack_require__(/*! ./health.module */ "./src/health/health.mod
 
 /***/ }),
 
+/***/ "./src/mailer/mail.module.ts":
+/*!***********************************!*\
+  !*** ./src/mailer/mail.module.ts ***!
+  \***********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MailModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const mailer_1 = __webpack_require__(/*! @nestjs-modules/mailer */ "@nestjs-modules/mailer");
+const handlebars_adapter_1 = __webpack_require__(/*! @nestjs-modules/mailer/dist/adapters/handlebars.adapter */ "@nestjs-modules/mailer/dist/adapters/handlebars.adapter");
+const path_1 = __webpack_require__(/*! path */ "path");
+const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
+const configService = new config_1.ConfigService();
+let MailModule = class MailModule {
+};
+exports.MailModule = MailModule;
+exports.MailModule = MailModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            mailer_1.MailerModule.forRootAsync({
+                useFactory: () => ({
+                    transport: {
+                        host: configService.get('SMTP_ADDRESS'),
+                        port: configService.get('SMTP_PORT'),
+                        auth: {
+                            user: configService.get('SMTP_USER_NAME'),
+                            pass: configService.get('SMTP_PASSWORD'),
+                        },
+                    },
+                    defaults: {
+                        from: '"Edlore" <' + configService.get('MAILER_FROM') + '>',
+                    },
+                    template: {
+                        dir: (0, path_1.join)(__dirname, 'mailer/templates'),
+                        adapter: new handlebars_adapter_1.HandlebarsAdapter(),
+                        options: {
+                            strict: true,
+                        },
+                    },
+                }),
+            }),
+        ],
+    })
+], MailModule);
+
+
+/***/ }),
+
 /***/ "./src/media/dto/response.ts":
 /*!***********************************!*\
   !*** ./src/media/dto/response.ts ***!
@@ -13102,7 +13449,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CreateMediaDTO = exports.SaveMediaDTO = exports.UploadFileParams = void 0;
+exports.CreateUnityAWSMediaDTO = exports.CreateAWSMediaDTO = exports.CreateMediaDTO = exports.SaveMediaDTO = exports.UploadFileParams = void 0;
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class UploadFileParams {
 }
@@ -13145,6 +13492,44 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateMediaDTO.prototype, "media_type", void 0);
+class CreateAWSMediaDTO {
+}
+exports.CreateAWSMediaDTO = CreateAWSMediaDTO;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateAWSMediaDTO.prototype, "media_title", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateAWSMediaDTO.prototype, "media_type", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateAWSMediaDTO.prototype, "original_file_name", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateAWSMediaDTO.prototype, "mime_type", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateAWSMediaDTO.prototype, "byte_size", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateAWSMediaDTO.prototype, "key", void 0);
+class CreateUnityAWSMediaDTO extends CreateAWSMediaDTO {
+}
+exports.CreateUnityAWSMediaDTO = CreateUnityAWSMediaDTO;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUnityAWSMediaDTO.prototype, "mediable_type", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUnityAWSMediaDTO.prototype, "mediable_id", void 0);
 
 
 /***/ }),
@@ -13196,7 +13581,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MediaController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -13218,6 +13603,12 @@ let MediaController = class MediaController {
     }
     async createMedia(file, body, req) {
         return await this.mediaService.createMedia(file, body, req.user.org_id);
+    }
+    async createAWSMedia(body, req) {
+        return await this.mediaService.createAWSMedia(body, req.user.org_id);
+    }
+    async createUnityAWSMedia(body, req) {
+        return await this.mediaService.createAWSMediaUnity(body, req.user.org_id);
     }
     async receiveInChunk(file) {
         return this.mediaService.receiveInChunk(file);
@@ -13262,11 +13653,27 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "createMedia", null);
 __decorate([
+    (0, common_1.Post)('create_aws_media'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_h = typeof upload_1.CreateAWSMediaDTO !== "undefined" && upload_1.CreateAWSMediaDTO) === "function" ? _h : Object, Object]),
+    __metadata("design:returntype", Promise)
+], MediaController.prototype, "createAWSMedia", null);
+__decorate([
+    (0, common_1.Post)('create_unity_aws_media'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_j = typeof upload_1.CreateUnityAWSMediaDTO !== "undefined" && upload_1.CreateUnityAWSMediaDTO) === "function" ? _j : Object, Object]),
+    __metadata("design:returntype", Promise)
+], MediaController.prototype, "createUnityAWSMedia", null);
+__decorate([
     (0, common_1.Post)('chunk'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     __param(0, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_j = typeof Express !== "undefined" && (_h = Express.Multer) !== void 0 && _h.File) === "function" ? _j : Object]),
+    __metadata("design:paramtypes", [typeof (_l = typeof Express !== "undefined" && (_k = Express.Multer) !== void 0 && _k.File) === "function" ? _l : Object]),
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "receiveInChunk", null);
 __decorate([
@@ -13274,7 +13681,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_k = typeof upload_1.UploadFileParams !== "undefined" && upload_1.UploadFileParams) === "function" ? _k : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_m = typeof upload_1.UploadFileParams !== "undefined" && upload_1.UploadFileParams) === "function" ? _m : Object]),
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "complete", null);
 __decorate([
@@ -13289,8 +13696,8 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, typeof (_l = typeof response_1.UpdateMediaDTO !== "undefined" && response_1.UpdateMediaDTO) === "function" ? _l : Object]),
-    __metadata("design:returntype", typeof (_m = typeof Promise !== "undefined" && Promise) === "function" ? _m : Object)
+    __metadata("design:paramtypes", [String, typeof (_o = typeof response_1.UpdateMediaDTO !== "undefined" && response_1.UpdateMediaDTO) === "function" ? _o : Object]),
+    __metadata("design:returntype", typeof (_p = typeof Promise !== "undefined" && Promise) === "function" ? _p : Object)
 ], MediaController.prototype, "updateMedia", null);
 __decorate([
     (0, common_1.Delete)(':id'),
@@ -13383,6 +13790,7 @@ const crypto = __webpack_require__(/*! crypto */ "crypto");
 const mime = __webpack_require__(/*! mime-types */ "mime-types");
 const axios_1 = __webpack_require__(/*! axios */ "axios");
 const common_utils_1 = __webpack_require__(/*! @app/common-utils */ "./libs/common-utils/src/index.ts");
+const uuid_1 = __webpack_require__(/*! uuid */ "uuid");
 let MediaService = class MediaService {
     constructor(configService, filterService, attachmentMediaRepository, attachmentRepository, blobRepository, dataSource) {
         this.configService = configService;
@@ -13505,6 +13913,10 @@ let MediaService = class MediaService {
             }
             return url;
         }
+        const metadata = blob.metadata ? JSON.parse(blob.metadata) : {};
+        if (metadata?.public) {
+            return blob.key;
+        }
         const command = new client_s3_1.GetObjectCommand({
             Bucket: this.bucket,
             Key: blob.key,
@@ -13524,8 +13936,9 @@ let MediaService = class MediaService {
             case '3d-zip':
                 return `${this.frontendURL}/image-zip.png`;
             case 'image':
-            case 'video':
                 return this.getSignedUrl(blob);
+            case 'video':
+                return `${this.frontendURL}/image-video.png`;
             default:
                 return `${this.frontendURL}/image-other.png`;
         }
@@ -13668,7 +14081,7 @@ let MediaService = class MediaService {
             });
         }
     }
-    async createMedia(file, body, org_id) {
+    async createMedia(file, body, org_id, service_name) {
         try {
             const result = await this.saveMedia(file, {
                 media_title: body.media_title,
@@ -13676,7 +14089,90 @@ let MediaService = class MediaService {
                 record_id: org_id,
                 record_type: 'Organization',
                 name: 'medias',
+            }, service_name);
+            const media = this.attachmentMediaRepository.create({
+                active_storage_attachment_id: result.id,
+                created_at: new Date(),
+                mediable_type: body.mediable_type,
+                mediable_id: body.mediable_id,
+                file_type: null,
             });
+            await this.attachmentMediaRepository.save(media);
+            return {
+                message: 'Successfully added to library and attached',
+            };
+        }
+        catch (error) {
+            console.log('🚀 ~ MediaService ~ createMedia ~ error:', error);
+            throw new common_1.BadRequestException({
+                is_sucess: false,
+                message: 'Something went wrong, please try again later!',
+            });
+        }
+    }
+    async createAWSMedia(body, org_id) {
+        try {
+            const blob = this.blobRepository.create({
+                created_at: new Date(),
+                key: body.key,
+                filename: body.original_file_name,
+                service_name: 'amazon',
+                content_type: body.mime_type,
+                byte_size: body.byte_size,
+                checksum: (0, uuid_1.v4)(),
+                metadata: {
+                    public: true,
+                },
+                title: body.media_title,
+                file_type: body.media_type || 'other',
+            });
+            await this.blobRepository.save(blob);
+            const attachment = this.attachmentRepository.create({
+                created_at: new Date(),
+                blob_id: blob.id,
+                record_id: org_id,
+                record_type: 'Organization',
+                name: 'medias',
+            });
+            await this.attachmentRepository.save(attachment);
+            return {
+                is_success: true,
+                file_url: body.key,
+            };
+        }
+        catch (error) {
+            console.log('🚀 ~ MediaService ~ createMedia ~ error:', error);
+            throw new common_1.BadRequestException({
+                is_sucess: false,
+                message: 'Something went wrong, please try again later!',
+            });
+        }
+    }
+    async createAWSMediaUnity(body, org_id) {
+        try {
+            const blob = this.blobRepository.create({
+                created_at: new Date(),
+                key: body.key,
+                filename: body.original_file_name,
+                service_name: 'amazon',
+                content_type: body.mime_type,
+                byte_size: body.byte_size,
+                checksum: (0, uuid_1.v4)(),
+                metadata: {
+                    public: true,
+                },
+                title: body.media_title,
+                file_type: body.media_type || 'other',
+            });
+            await this.blobRepository.save(blob);
+            const attachment = this.attachmentRepository.create({
+                created_at: new Date(),
+                blob_id: blob.id,
+                record_id: org_id,
+                record_type: 'Organization',
+                name: 'medias',
+            });
+            const result = await this.attachmentRepository.save(attachment);
             const media = this.attachmentMediaRepository.create({
                 active_storage_attachment_id: result.id,
                 created_at: new Date(),
@@ -13857,7 +14353,9 @@ let MediaService = class MediaService {
             content_type: blob.content_type,
             file_name: blob.filename,
             file_type: blob.file_type,
-            url: `${this.publicFolder}/${blob.key}`,
+            url: blob.service_name === 'local'
+                ? `${this.publicFolder}/${blob.key}`
+                : blob.key,
             thumb_url: await this.getThumbnailUrl(blob.file_type, blob),
         };
     }
@@ -13877,7 +14375,7 @@ let MediaService = class MediaService {
             throw new common_1.BadRequestException(error + 'Unable to download file or file is not CSV format');
         }
     }
-    async saveMedia(file, data) {
+    async saveMedia(file, data, service_name) {
         const fileData = await this.uploadFile(file);
         const config = this.configService.getMachineInfo();
         const mime_type = mime.lookup(file.originalname) || 'application/octet-stream';
@@ -13886,7 +14384,7 @@ let MediaService = class MediaService {
             created_at: new Date(),
             key: fileData.file_name,
             filename: fileData.file_name,
-            service_name: config.mode === 'OFFLINE' ? 'local' : 'amazon',
+            service_name: service_name || config.mode === 'OFFLINE' ? 'local' : 'amazon',
             content_type: mime_type,
             byte_size: file.buffer.length,
             checksum,
@@ -15263,10 +15761,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.OrganizationService = void 0;
+exports.OrganizationService = exports.ClientData = void 0;
 const config_1 = __webpack_require__(/*! @app/config */ "./libs/config/src/index.ts");
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const ClientData = {
+exports.ClientData = {
     airforce: {
         org_logo: 'logo-airforce.png',
         title: 'Air Force',
@@ -15282,6 +15780,16 @@ const ClientData = {
         title: 'CAMCOKW',
         description: 'CAMCOKW GLOBAL',
     },
+    demo: {
+        org_logo: 'logo-demo.png',
+        title: 'Edlore',
+        description: 'Maintenance Intelligence at Your Fingertips',
+    },
+    ncms: {
+        org_logo: 'logo-ncms.png',
+        title: 'NCMS',
+        description: 'Office of NAVAL Research (ONR)',
+    },
 };
 let OrganizationService = class OrganizationService {
     constructor(configService) {
@@ -15291,8 +15799,7 @@ let OrganizationService = class OrganizationService {
     }
     logo() {
         const { client } = this.configService.getClient();
-        console.log("====================", client);
-        const clientData = ClientData[client.toLowerCase()];
+        const clientData = exports.ClientData[client.toLowerCase()];
         return {
             ...clientData,
             org_logo: `${this.frontendURL}/${clientData.org_logo}`,
@@ -15305,6 +15812,364 @@ exports.OrganizationService = OrganizationService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [typeof (_a = typeof config_1.AppConfigService !== "undefined" && config_1.AppConfigService) === "function" ? _a : Object])
 ], OrganizationService);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/dto/add-edit.ts":
+/*!*****************************************!*\
+  !*** ./src/part-fields/dto/add-edit.ts ***!
+  \*****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateUpdatePartFieldsDTO = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateUpdatePartFieldsDTO {
+}
+exports.CreateUpdatePartFieldsDTO = CreateUpdatePartFieldsDTO;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUpdatePartFieldsDTO.prototype, "name", void 0);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/dto/part-fields.ts":
+/*!********************************************!*\
+  !*** ./src/part-fields/dto/part-fields.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsDTO = void 0;
+class PartFieldsDTO {
+}
+exports.PartFieldsDTO = PartFieldsDTO;
+
+
+/***/ }),
+
+/***/ "./src/part-fields/index.ts":
+/*!**********************************!*\
+  !*** ./src/part-fields/index.ts ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__webpack_require__(/*! ./part-fields.module */ "./src/part-fields/part-fields.module.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/part-fields.controller.ts":
+/*!***************************************************!*\
+  !*** ./src/part-fields/part-fields.controller.ts ***!
+  \***************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d, _e, _f, _g, _h;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const part_fields_service_1 = __webpack_require__(/*! ./part-fields.service */ "./src/part-fields/part-fields.service.ts");
+const add_edit_1 = __webpack_require__(/*! ./dto/add-edit */ "./src/part-fields/dto/add-edit.ts");
+const swagger_1 = __webpack_require__(/*! @nestjs/swagger */ "@nestjs/swagger");
+let PartFieldsController = class PartFieldsController {
+    constructor(partFieldsService) {
+        this.partFieldsService = partFieldsService;
+    }
+    async get() {
+        return this.partFieldsService.get();
+    }
+    async getById(id) {
+        return this.partFieldsService.getById(id);
+    }
+    async create(createPartFieldsDto) {
+        return this.partFieldsService.create(createPartFieldsDto);
+    }
+    async update(id, updatePartFieldsDto) {
+        return this.partFieldsService.update(id, updatePartFieldsDto);
+    }
+    async remove(id) {
+        return this.partFieldsService.remove(id);
+    }
+};
+exports.PartFieldsController = PartFieldsController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+], PartFieldsController.prototype, "get", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+], PartFieldsController.prototype, "getById", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_d = typeof add_edit_1.CreateUpdatePartFieldsDTO !== "undefined" && add_edit_1.CreateUpdatePartFieldsDTO) === "function" ? _d : Object]),
+    __metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+], PartFieldsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_f = typeof add_edit_1.CreateUpdatePartFieldsDTO !== "undefined" && add_edit_1.CreateUpdatePartFieldsDTO) === "function" ? _f : Object]),
+    __metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+], PartFieldsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
+], PartFieldsController.prototype, "remove", null);
+exports.PartFieldsController = PartFieldsController = __decorate([
+    (0, common_1.Controller)('part_fields'),
+    (0, swagger_1.ApiTags)('part_fields'),
+    __metadata("design:paramtypes", [typeof (_a = typeof part_fields_service_1.PartFieldsService !== "undefined" && part_fields_service_1.PartFieldsService) === "function" ? _a : Object])
+], PartFieldsController);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/part-fields.module.ts":
+/*!***********************************************!*\
+  !*** ./src/part-fields/part-fields.module.ts ***!
+  \***********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const typeorm_1 = __webpack_require__(/*! @nestjs/typeorm */ "@nestjs/typeorm");
+const part_fields_controller_1 = __webpack_require__(/*! ./part-fields.controller */ "./src/part-fields/part-fields.controller.ts");
+const part_fields_service_1 = __webpack_require__(/*! ./part-fields.service */ "./src/part-fields/part-fields.service.ts");
+const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
+let PartFieldsModule = class PartFieldsModule {
+};
+exports.PartFieldsModule = PartFieldsModule;
+exports.PartFieldsModule = PartFieldsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([schema_1.PartFields])],
+        controllers: [part_fields_controller_1.PartFieldsController],
+        providers: [part_fields_service_1.PartFieldsService],
+    })
+], PartFieldsModule);
+
+
+/***/ }),
+
+/***/ "./src/part-fields/part-fields.service.ts":
+/*!************************************************!*\
+  !*** ./src/part-fields/part-fields.service.ts ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PartFieldsService = void 0;
+const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const typeorm_1 = __webpack_require__(/*! @nestjs/typeorm */ "@nestjs/typeorm");
+const typeorm_2 = __webpack_require__(/*! typeorm */ "typeorm");
+const typeorm_3 = __webpack_require__(/*! typeorm */ "typeorm");
+const part_fields_1 = __webpack_require__(/*! ./dto/part-fields */ "./src/part-fields/dto/part-fields.ts");
+const fs = __webpack_require__(/*! fs */ "fs");
+const path = __webpack_require__(/*! path */ "path");
+let PartFieldsService = class PartFieldsService {
+    constructor(partFieldsRepository, dataSource) {
+        this.partFieldsRepository = partFieldsRepository;
+        this.dataSource = dataSource;
+        this.addExtraHeader = (filePath, extraHeaders) => {
+            const absPath = path.resolve(filePath);
+            const lines = fs.readFileSync(absPath, 'utf-8').split('\n');
+            if (lines.length === 0) {
+                throw new Error('CSV file is empty');
+            }
+            const defaultHeaders = ['layer_id*', 'part_name*', 'part_id*', 'part_description', 'purchase_url'];
+            const combinedHeaders = defaultHeaders.concat(extraHeaders);
+            lines[0] = `${combinedHeaders.join(',')}`;
+            fs.writeFileSync(absPath, lines.join('\n'), 'utf-8');
+        };
+    }
+    convertToDTO(partFields) {
+        const dto = new part_fields_1.PartFieldsDTO();
+        dto.id = partFields.id;
+        dto.name = partFields.name;
+        return dto;
+    }
+    async get() {
+        const partFields = await this.partFieldsRepository.find();
+        const data = partFields.map((partfield) => this.convertToDTO(partfield));
+        if (data.length != 0) {
+            const namesJson = JSON.stringify(data);
+            const namesArray = await data.map(item => item.name);
+            await this.addExtraHeader('./public/parts.csv', namesArray);
+        }
+        return { data };
+    }
+    async getById(id) {
+        const partFields = await this.partFieldsRepository.findOne({
+            where: { id },
+        });
+        if (!partFields) {
+            throw new common_1.NotFoundException(`PartFields with id ${id} not found`);
+        }
+        return this.convertToDTO(partFields);
+    }
+    async create(data) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const existingPartFields = await queryRunner.manager.findOne(schema_1.PartFields, {
+                where: { name: data.name },
+            });
+            if (existingPartFields) {
+                throw new Error('Name must be unique');
+            }
+            const partFields = queryRunner.manager.create(schema_1.PartFields, data);
+            await queryRunner.manager.save(partFields);
+            await queryRunner.commitTransaction();
+            return this.convertToDTO(partFields);
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async update(id, data) {
+        const partFields = await this.partFieldsRepository.findOne({
+            where: { id },
+        });
+        if (!partFields) {
+            throw new common_1.NotFoundException(`PartFields with id ${id} not found`);
+        }
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const existingPartFields = await queryRunner.manager.findOne(schema_1.PartFields, {
+                where: { name: data.name, id: (0, typeorm_2.Not)(id) },
+            });
+            if (existingPartFields) {
+                throw new Error('Name must be unique');
+            }
+            Object.assign(partFields, data);
+            await queryRunner.manager.save(partFields);
+            await queryRunner.commitTransaction();
+            return this.convertToDTO(partFields);
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async remove(id) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const partFields = await queryRunner.manager.findOne(schema_1.PartFields, {
+                where: { id },
+            });
+            if (!partFields) {
+                throw new common_1.NotFoundException(`PartFields with id ${id} not found`);
+            }
+            await queryRunner.manager.remove(schema_1.PartFields, partFields);
+            await queryRunner.commitTransaction();
+            return { message: 'Deleted Successfully', title: partFields.name };
+        }
+        catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+};
+exports.PartFieldsService = PartFieldsService;
+exports.PartFieldsService = PartFieldsService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(schema_1.PartFields)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_3.DataSource !== "undefined" && typeorm_3.DataSource) === "function" ? _b : Object])
+], PartFieldsService);
 
 
 /***/ }),
@@ -15489,9 +16354,10 @@ let PermissionService = class PermissionService {
             });
         }
         if (role_id) {
-            queryBuilder.andWhere('role_permissions.role_id = :role_id', {
-                role_id,
-            });
+            queryBuilder
+                .addSelect(`CASE WHEN role_permissions.role_id IN (:...ids) THEN 0 ELSE 1 END`, 'rank')
+                .orderBy('rank', 'ASC')
+                .setParameter('ids', [role_id]);
         }
         const [permissions, totalEntries] = await queryBuilder.getManyAndCount();
         return {
@@ -15973,9 +16839,7 @@ let ProcedureService = class ProcedureService {
             });
         }
         const duplicateTitle = await this.customUniqueService.isExist(schema_1.Procedure, 'name', data.name, {
-            model_id: {
-                id: modelId,
-            },
+            model_id: modelId,
         });
         if (duplicateTitle) {
             throw new common_1.BadRequestException({ error: 'Title should be unique' });
@@ -17265,9 +18129,7 @@ let SectionService = class SectionService {
             });
         }
         const duplicateTitle = await this.customUniqueService.isExist(schema_1.Section, 'title', data.title, {
-            model_id: {
-                id: modelId,
-            },
+            model_id: modelId,
         });
         if (duplicateTitle) {
             throw new common_1.BadRequestException({ error: 'Title should be unique' });
@@ -17282,9 +18144,7 @@ let SectionService = class SectionService {
     }
     async update(id, modelId, data) {
         const duplicateTitle = await this.customUniqueService.isExist(schema_1.Section, 'title', data.title, {
-            model_id: {
-                id: modelId,
-            },
+            model_id: modelId,
         }, id);
         if (duplicateTitle) {
             throw new common_1.BadRequestException({ error: 'Title should be unique' });
@@ -17851,7 +18711,7 @@ let SketchService = class SketchService {
         }
         const duplicateTitle = await this.customUniqueService.isExist(schema_1.Sketch, 'title', data.title, {
             sketch_type: data.sketch_type,
-            model_id: modelId,
+            model: { id: modelId },
         });
         if (duplicateTitle) {
             throw new common_1.BadRequestException({ error: 'Title should be unique' });
@@ -18552,7 +19412,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StepService = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -18560,10 +19420,12 @@ const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index
 const typeorm_1 = __webpack_require__(/*! typeorm */ "typeorm");
 const media_service_1 = __webpack_require__(/*! src/media/media.service */ "./src/media/media.service.ts");
 const typeorm_2 = __webpack_require__(/*! @nestjs/typeorm */ "@nestjs/typeorm");
+const config_1 = __webpack_require__(/*! @app/config */ "./libs/config/src/index.ts");
 let StepService = class StepService {
-    constructor(mediaService, stepRepository) {
+    constructor(mediaService, stepRepository, configService) {
         this.mediaService = mediaService;
         this.stepRepository = stepRepository;
+        this.configService = configService;
     }
     async converToStepDTO(step) {
         const temp = {
@@ -18592,6 +19454,7 @@ let StepService = class StepService {
                 title: data.title,
             });
             await this.stepRepository.save(step);
+            const machineInfo = this.configService.getMachineInfo();
             if (files && files['medias[]']) {
                 const uploadedFiles = files['medias[]'] || [];
                 for (let i = 0; i < uploadedFiles.length; i++) {
@@ -18602,7 +19465,7 @@ let StepService = class StepService {
                         media_type: mediaType,
                         mediable_id: step.id,
                         mediable_type: 'Step',
-                    }, org_id);
+                    }, org_id, machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon');
                 }
             }
             const response = await this.stepRepository
@@ -18625,7 +19488,7 @@ exports.StepService = StepService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)()),
     __param(1, (0, typeorm_2.InjectRepository)(schema_1.Step)),
-    __metadata("design:paramtypes", [typeof (_a = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _a : Object, typeof (_b = typeof typeorm_1.Repository !== "undefined" && typeorm_1.Repository) === "function" ? _b : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof media_service_1.MediaService !== "undefined" && media_service_1.MediaService) === "function" ? _a : Object, typeof (_b = typeof typeorm_1.Repository !== "undefined" && typeorm_1.Repository) === "function" ? _b : Object, typeof (_c = typeof config_1.AppConfigService !== "undefined" && config_1.AppConfigService) === "function" ? _c : Object])
 ], StepService);
 
 
@@ -18663,11 +19526,11 @@ exports.SYNC_TABLE_ORDERS = [
     'active_storage_attachments',
     'attached_media',
 ];
-const GetSyncAPI = (ipAddress, last_sync_at) => `http://${ipAddress}:5100/api/v1/sync/pull?lastSyncAt=${last_sync_at}`;
+const GetSyncAPI = (ipAddress, last_sync_at) => `http://${ipAddress}/api/v1/sync/pull?lastSyncAt=${last_sync_at}`;
 exports.GetSyncAPI = GetSyncAPI;
-const PostSyncAPI = (ipAddress) => `http://${ipAddress}:5100/api/v1/sync/push`;
+const PostSyncAPI = (ipAddress) => `http://${ipAddress}/api/v1/sync/push`;
 exports.PostSyncAPI = PostSyncAPI;
-const GetHealthAPI = (ipAddress) => `http://${ipAddress}:5100/api/v1/health`;
+const GetHealthAPI = (ipAddress) => `http://${ipAddress}/api/v1/health`;
 exports.GetHealthAPI = GetHealthAPI;
 
 
@@ -18884,7 +19747,8 @@ let SyncService = class SyncService {
             });
             const lastSyncAt = new Date(machine.last_sync_at);
             lastSyncAt.setHours(lastSyncAt.getHours() - 12);
-            const url = (0, sync_constant_1.GetSyncAPI)(machine.ipaddress, common_utils_1.DateUtilsService.dateToString(lastSyncAt, common_utils_1.DateFormat.serverDate));
+            const config = this.appConfigService.getPort();
+            const url = (0, sync_constant_1.GetSyncAPI)(`${machine.ipaddress}:${config.port}`, common_utils_1.DateUtilsService.dateToString(lastSyncAt, common_utils_1.DateFormat.serverDate));
             const response = await axios_1.default.get(url, {
                 responseType: 'arraybuffer',
                 timeout: 60000 * 10,
@@ -18913,7 +19777,8 @@ let SyncService = class SyncService {
                 sync_start_at: new Date(),
                 sync_status: 'Processing',
             });
-            const url = (0, sync_constant_1.PostSyncAPI)(machine.ipaddress);
+            const config = this.appConfigService.getPort();
+            const url = (0, sync_constant_1.PostSyncAPI)(`${machine.ipaddress}:${config.port}`);
             const formData = new FormData();
             formData.append('file', zipBuffer, {
                 filename: 'data.zip',
@@ -18946,7 +19811,8 @@ let SyncService = class SyncService {
             const machine = surfacePros[index];
             if (!machine.is_syncing) {
                 try {
-                    const url = (0, sync_constant_1.GetHealthAPI)(machine.ipaddress);
+                    const config = this.appConfigService.getPort();
+                    const url = (0, sync_constant_1.GetHealthAPI)(`${machine.ipaddress}:${config.port}`);
                     console.log('🚀 ~ SyncService ~ syncMachineCron ~ url:', url);
                     await axios_1.default.get(url, {
                         timeout: 10000,
@@ -19983,9 +20849,7 @@ let TroubleshootService = class TroubleshootService {
             });
         }
         const duplicateTitle = await this.customUniqueService.isExist(schema_1.Troubleshoot, 'title', data.title, {
-            model_id: {
-                id: modelId,
-            },
+            model_id: modelId,
         });
         if (duplicateTitle) {
             throw new common_1.BadRequestException({ error: 'Title should be unique' });
@@ -20140,7 +21004,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CreateUserRoleDto = exports.UserRoleSearchParams = exports.UserRoleFilterDto = exports.UserRoleResponse = exports.UserRoleResponseDto = exports.PermissionDto = void 0;
+exports.CreateUserRoleDto = exports.RolePermissionsAttributeDto = exports.UserRoleSearchParams = exports.UserRoleFilterDto = exports.UserRoleResponse = exports.UserRoleResponseDto = exports.PermissionDto = void 0;
 const dto_1 = __webpack_require__(/*! @app/schema/dto */ "./libs/schema/src/dto/index.ts");
 const class_transformer_1 = __webpack_require__(/*! class-transformer */ "class-transformer");
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
@@ -20233,6 +21097,13 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UserRoleSearchParams.prototype, "user_id", void 0);
+class RolePermissionsAttributeDto {
+}
+exports.RolePermissionsAttributeDto = RolePermissionsAttributeDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RolePermissionsAttributeDto.prototype, "permission_id", void 0);
 class CreateUserRoleDto {
 }
 exports.CreateUserRoleDto = CreateUserRoleDto;
@@ -20248,7 +21119,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Array)
-], CreateUserRoleDto.prototype, "permissions", void 0);
+], CreateUserRoleDto.prototype, "role_permissions_attributes", void 0);
 
 
 /***/ }),
@@ -20391,6 +21262,7 @@ exports.UserRoleModule = UserRoleModule = __decorate([
             schema_1.DBSchemas.user,
             schema_1.DBSchemas.role,
             schema_1.DBSchemas.permission,
+            schema_1.DBSchemas.rolePermissions,
         ],
         controllers: [user_role_controller_1.UserRoleController],
         providers: [user_role_service_1.UserRoleService],
@@ -20430,10 +21302,10 @@ const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index
 const common_utils_1 = __webpack_require__(/*! @app/common-utils */ "./libs/common-utils/src/index.ts");
 const service_1 = __webpack_require__(/*! @app/schema/service */ "./libs/schema/src/service/index.ts");
 let UserRoleService = class UserRoleService {
-    constructor(userRepository, roleRepository, permissionRepository, filterService) {
+    constructor(userRepository, roleRepository, rolePermissionRepository, filterService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.permissionRepository = permissionRepository;
+        this.rolePermissionRepository = rolePermissionRepository;
         this.filterService = filterService;
     }
     convertToDTO(role) {
@@ -20517,35 +21389,23 @@ let UserRoleService = class UserRoleService {
         return this.convertToDTO(userRole);
     }
     async create(createUserRoleDto) {
-        const { title, description, permissions } = createUserRoleDto;
+        const { title, description, role_permissions_attributes: permissions, } = createUserRoleDto;
         const newRole = this.roleRepository.create({
             title,
             description,
             role_permissions: permissions.map((permissionId) => ({
-                permission: { id: permissionId },
+                permission: { id: permissionId.permission_id },
             })),
         });
         await this.roleRepository.save(newRole);
-        const rolePermissions = await Promise.all(permissions.map(async (permissionId) => {
-            const permission = await this.permissionRepository.findOne({
-                where: { id: permissionId },
-            });
-            if (!permission) {
-                throw new common_1.NotFoundException(`Permission with ID ${permissionId} not found`);
-            }
-            return {
-                permission,
-                created_at: common_utils_1.DateUtilsService.dateToString(permission.created_at),
-            };
-        }));
-        newRole.role_permissions = rolePermissions.map((rolePermission) => {
+        await Promise.all(permissions.map(async (permissionId) => {
             const rolePermissionEntity = new schema_1.RolePermissions();
-            rolePermissionEntity.permission = rolePermission.permission;
+            rolePermissionEntity.permission_id = permissionId.permission_id;
             rolePermissionEntity.role = newRole;
-            return rolePermissionEntity;
-        });
-        await this.roleRepository.save(newRole);
-        return this.convertToDTO(newRole);
+            await this.rolePermissionRepository.save(rolePermissionEntity);
+        }));
+        const role = await this.getById(newRole.id);
+        return role;
     }
     async update(id, updateUserRoleDto) {
         const role = await this.roleRepository.findOne({
@@ -20557,22 +21417,18 @@ let UserRoleService = class UserRoleService {
         }
         role.title = updateUserRoleDto.title;
         role.description = updateUserRoleDto.description;
-        role.role_permissions = await Promise.all(updateUserRoleDto.permissions.map(async (permissionId) => {
-            const permission = await this.permissionRepository.findOne({
-                where: { id: permissionId },
-            });
-            if (!permission) {
-                throw new common_1.NotFoundException(`Permission with ID ${permissionId} not found`);
-            }
-            const rolePermission = new schema_1.RolePermissions();
-            rolePermission.permission = permission;
-            rolePermission.role = role;
-            rolePermission.role_id = role.id;
-            rolePermission.permission_id = permissionId;
-            return rolePermission;
-        }));
         await this.roleRepository.save(role);
-        return this.convertToDTO(role);
+        await this.rolePermissionRepository.delete({
+            role_id: role.id,
+        });
+        await Promise.all(updateUserRoleDto.role_permissions_attributes.map(async (permissionId) => {
+            const rolePermission = new schema_1.RolePermissions();
+            rolePermission.role_id = role.id;
+            rolePermission.permission_id = permissionId.permission_id;
+            await this.rolePermissionRepository.save(rolePermission);
+        }));
+        const roleResult = await this.getById(role.id);
+        return roleResult;
     }
 };
 exports.UserRoleService = UserRoleService;
@@ -20580,7 +21436,7 @@ exports.UserRoleService = UserRoleService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(schema_1.User)),
     __param(1, (0, typeorm_1.InjectRepository)(schema_1.Role)),
-    __param(2, (0, typeorm_1.InjectRepository)(schema_1.Permission)),
+    __param(2, (0, typeorm_1.InjectRepository)(schema_1.RolePermissions)),
     __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _b : Object, typeof (_c = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _c : Object, typeof (_d = typeof service_1.FilterService !== "undefined" && service_1.FilterService) === "function" ? _d : Object])
 ], UserRoleService);
 
@@ -20954,8 +21810,9 @@ let UsersController = class UsersController {
     async getById(id) {
         return await this.userService.getById(id);
     }
-    async create(data) {
-        return await this.userService.create(data);
+    async create(data, files) {
+        const image = (files || []).find((file) => file.fieldname === 'image');
+        return await this.userService.create(data, image);
     }
     async changeStatus(req, data) {
         const loggedInUserId = req.user.id;
@@ -21044,8 +21901,9 @@ __decorate([
     (0, common_1.Post)(''),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_e = typeof user_1.CreateUserDTO !== "undefined" && user_1.CreateUserDTO) === "function" ? _e : Object]),
+    __metadata("design:paramtypes", [typeof (_e = typeof user_1.CreateUserDTO !== "undefined" && user_1.CreateUserDTO) === "function" ? _e : Object, Array]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "create", null);
 __decorate([
@@ -21173,7 +22031,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d;
+var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UserService = void 0;
 const schema_1 = __webpack_require__(/*! @app/schema */ "./libs/schema/src/index.ts");
@@ -21185,12 +22043,16 @@ const service_1 = __webpack_require__(/*! @app/schema/service */ "./libs/schema/
 const common_utils_1 = __webpack_require__(/*! @app/common-utils */ "./libs/common-utils/src/index.ts");
 const bcrypt = __webpack_require__(/*! bcrypt */ "bcrypt");
 const media_1 = __webpack_require__(/*! src/media */ "./src/media/index.ts");
+const mailer_1 = __webpack_require__(/*! @nestjs-modules/mailer */ "@nestjs-modules/mailer");
+const config_1 = __webpack_require__(/*! @app/config */ "./libs/config/src/index.ts");
 let UserService = class UserService {
-    constructor(userRepository, dataSource, filterService, mediaService) {
+    constructor(userRepository, dataSource, filterService, mediaService, mailerService, configService) {
         this.userRepository = userRepository;
         this.dataSource = dataSource;
         this.filterService = filterService;
         this.mediaService = mediaService;
+        this.mailerService = mailerService;
+        this.configService = configService;
     }
     async convertToDTO(user) {
         const response = new user_1.UserResponseDto();
@@ -21345,7 +22207,7 @@ let UserService = class UserService {
         }
         return await this.convertToDTO(user);
     }
-    async create(data) {
+    async create(data, image) {
         const emailCheck = await this.userRepository.count({
             where: { email: data.email.toLowerCase() },
         });
@@ -21383,6 +22245,30 @@ let UserService = class UserService {
                 updated_at: new Date(),
             });
             await queryRunner.commitTransaction();
+            const machineInfo = this.configService.getMachineInfo();
+            if (image) {
+                await this.mediaService.saveMedia(image, {
+                    media_title: user.first_name,
+                    media_type: 'image',
+                    name: 'image',
+                    record_id: savedUser.id,
+                    record_type: 'User',
+                }, machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon');
+            }
+            if (machineInfo.mode === 'ONLINE') {
+                await this.mailerService.sendMail({
+                    to: user.email,
+                    subject: "Welcome to Edlore! Let's get started.",
+                    template: './welcome.mailer.hbs',
+                    context: {
+                        name: user.first_name,
+                        email: user.email,
+                        password: data.password,
+                        media_domain: this.configService.getMailerConfig().media_domain,
+                        frontEndDomain: this.configService.getMailerConfig().login_domain,
+                    },
+                });
+            }
             return await this.convertToDTO(savedUser);
         }
         catch (error) {
@@ -21466,6 +22352,7 @@ let UserService = class UserService {
             }
         }
         if (image) {
+            const machineInfo = this.configService.getMachineInfo();
             await this.mediaService.deleteRecordMedia(user.id, 'User');
             await this.mediaService.saveMedia(image, {
                 media_title: first_name,
@@ -21473,7 +22360,7 @@ let UserService = class UserService {
                 name: 'image',
                 record_id: user.id,
                 record_type: 'User',
-            });
+            }, machineInfo.mode === 'OFFLINE' ? 'local' : 'amazon');
         }
         user.first_name = first_name;
         user.last_name = last_name;
@@ -21485,11 +22372,12 @@ let UserService = class UserService {
         delete user.attachedMedia;
         delete user.user_roles;
         const newData = await this.userRepository.save(user);
+        const resultData = await this.currentUserDetails(id);
         return {
             user_id: id,
             Message: 'Successfully Updated the User',
             user: {
-                ...newData,
+                ...resultData,
                 full_name: `${newData.first_name} ${newData.last_name}`,
             },
         };
@@ -21590,7 +22478,7 @@ exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(schema_1.User)),
-    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.DataSource !== "undefined" && typeorm_2.DataSource) === "function" ? _b : Object, typeof (_c = typeof service_1.FilterService !== "undefined" && service_1.FilterService) === "function" ? _c : Object, typeof (_d = typeof media_1.MediaService !== "undefined" && media_1.MediaService) === "function" ? _d : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object, typeof (_b = typeof typeorm_2.DataSource !== "undefined" && typeorm_2.DataSource) === "function" ? _b : Object, typeof (_c = typeof service_1.FilterService !== "undefined" && service_1.FilterService) === "function" ? _c : Object, typeof (_d = typeof media_1.MediaService !== "undefined" && media_1.MediaService) === "function" ? _d : Object, typeof (_e = typeof mailer_1.MailerService !== "undefined" && mailer_1.MailerService) === "function" ? _e : Object, typeof (_f = typeof config_1.AppConfigService !== "undefined" && config_1.AppConfigService) === "function" ? _f : Object])
 ], UserService);
 
 
@@ -22514,6 +23402,26 @@ module.exports = require("@aws-sdk/client-s3");
 /***/ ((module) => {
 
 module.exports = require("@aws-sdk/s3-request-presigner");
+
+/***/ }),
+
+/***/ "@nestjs-modules/mailer":
+/*!*****************************************!*\
+  !*** external "@nestjs-modules/mailer" ***!
+  \*****************************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs-modules/mailer");
+
+/***/ }),
+
+/***/ "@nestjs-modules/mailer/dist/adapters/handlebars.adapter":
+/*!**************************************************************************!*\
+  !*** external "@nestjs-modules/mailer/dist/adapters/handlebars.adapter" ***!
+  \**************************************************************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs-modules/mailer/dist/adapters/handlebars.adapter");
 
 /***/ }),
 

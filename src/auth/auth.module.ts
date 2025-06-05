@@ -6,7 +6,8 @@ import { DBSchemas } from '@app/schema';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { AppConfigService } from '@app/config';
 import { JwtStrategy } from './jwt.strategy';
-import { MediaModule } from 'src/media';
+import { MediaModule } from '../media/media.module';
+import { MailModule } from '../mailer/mail.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MediaModule } from 'src/media';
     DBSchemas.otp,
     DBSchemas.deviceToken,
     MediaModule,
+    MailModule,
     JwtModule.registerAsync({
       inject: [AppConfigService],
       useFactory: async (configService: AppConfigService) => {

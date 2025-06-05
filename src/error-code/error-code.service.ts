@@ -325,7 +325,7 @@ export class ErrorCodeService {
       await queryRunner.commitTransaction();
 
       const response = await this.getById(errorCode.id);
-      return response;
+      return response.error;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -436,7 +436,7 @@ export class ErrorCodeService {
       // Commit the transaction
       await queryRunner.commitTransaction();
 
-      return { message: 'Deleted Successfully', error: errorCode };
+      return { message: 'Deleted Successfully', title: errorCode.title };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

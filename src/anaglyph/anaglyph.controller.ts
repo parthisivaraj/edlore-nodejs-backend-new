@@ -107,6 +107,11 @@ export class AnaglyphController {
     return await this.anaglyphService.getPartNoteById(modelId, partId, noteId);
   }
 
+  @Get('/anaglyph/:id/parts/csv_upload_status')
+  async getCSVUpload() {
+    return;
+  }
+
   @Get('/anaglyph/:id/parts/:partId')
   async getByPartId(@Param('partId') partId: string) {
     return await this.anaglyphService.getByPartId(partId);

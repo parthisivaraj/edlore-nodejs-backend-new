@@ -41,6 +41,7 @@ import {
   AddEditPartNoteRequestDTO,
   AddEditPartRequestDTO,
 } from './dto/add-edit-part';
+import axios from 'axios';
 
 @Injectable()
 export class AnaglyphService {
@@ -334,9 +335,7 @@ export class AnaglyphService {
       'title',
       data.title,
       {
-        model: {
-          id: modelId,
-        },
+        model: { id: modelId },
       },
     );
     if (duplicateTitle) {
@@ -348,12 +347,12 @@ export class AnaglyphService {
         section: {
           id: data.section_id,
         },
+        is_deleted: false,
       },
     });
-    if (!sectionHasAnalyph) {
-      throw new HttpException(
-        { message: 'The given section is associated with another 3D file' },
-        HttpStatus.BAD_REQUEST,
+    if (sectionHasAnalyph) {
+      throw new BadRequestException(
+        'The given section is associated with another 3D file',
       );
     }
 
@@ -385,9 +384,7 @@ export class AnaglyphService {
 
       const response = await this.getById(anaglyph.id);
 
-      return {
-        anaglyph: response,
-      };
+      return response;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -418,12 +415,12 @@ export class AnaglyphService {
             section: {
               id: data.section_id,
             },
+            is_deleted: false,
           },
         });
-        if (!sectionHasAnalyph) {
-          throw new HttpException(
-            { message: 'The given section is associated with another 3D file' },
-            HttpStatus.CONFLICT,
+        if (sectionHasAnalyph) {
+          throw new BadRequestException(
+            'The given section is associated with another 3D file',
           );
         }
         Object.assign(anaglyph, {
@@ -432,7 +429,7 @@ export class AnaglyphService {
       }
       if (data.title) {
         Object.assign(anaglyph, {
-          name: data.title,
+          title: data.title,
         });
       }
       if (data.purchase_link) {
@@ -454,10 +451,7 @@ export class AnaglyphService {
 
       const response = await this.getById(anaglyph.id);
 
-      return {
-        anaglyph: response,
-        message: 'Anaglyph Updated Successfully',
-      };
+      return response;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -718,7 +712,7 @@ export class AnaglyphService {
         anaglyph: {
           id: id,
         },
-      });      
+      });
 
       // await queryRunner.manager.delete(AttachedMedia, {
       //   mediable_id: id,
@@ -1036,77 +1030,87 @@ export class AnaglyphService {
   ): Promise<{ message: string; status: number }> {
     try {
       const results = [];
+      let stream;
 
-      fs.createReadStream(filePath)
-        .pipe(csv())
-        .on('data', (data) => {
-          results.push(data);
-        })
-        .on('end', async () => {
-          const queryRunner = this.dataSource.createQueryRunner();
-          await queryRunner.connect();
-          await queryRunner.startTransaction();
+      if (/^https?:\/\//.test(filePath)) {
+        const response = await axios.get(filePath, { responseType: 'stream' });
+        stream = response.data;
+      } else {
+        stream = fs.createReadStream(filePath);
+      }
 
-          try {
-            const anaglyph = await this.anaglyphRepository.findOne({
-              where: { id: anaglyphId },
-            });
+      return new Promise((resolve, reject) => {
+        stream
+          .pipe(csv())
+          .on('data', (data) => results.push(data))
+          .on('end', async () => {
+            const queryRunner = this.dataSource.createQueryRunner();
+            await queryRunner.connect();
+            await queryRunner.startTransaction();
 
-            if (!anaglyph) {
-              throw new BadRequestException({
-                error: `Anaglyph with ID ${anaglyphId} not found`,
-              });
-            }
-
-            for (const record of results) {
-              const existingPart = await queryRunner.manager.findOne(Part, {
-                where: {
-                  layer_id: record['layer_id*'],
-                  anaglyph: anaglyph,
-                },
+            try {
+              const anaglyph = await this.anaglyphRepository.findOne({
+                where: { id: anaglyphId },
               });
 
-              if (existingPart) {
-                existingPart.part_name = record['part_name*'];
-                existingPart.part_id = record['part_id*'];
-                existingPart.part_description = record['part_description'];
-                existingPart.purchase_url = record['purchase_url'];
-                existingPart.nsn_number = record['nsn_number'];
-                existingPart.nomenclature = record['nomenclature'];
-                existingPart.manufacturer_code = record['mfr_code'];
-                existingPart.quantity = record['quantity']
-                  ? Number(record['quantity'])
-                  : 0;
+              if (!anaglyph) {
+                throw new BadRequestException({
+                  error: `Anaglyph with ID ${anaglyphId} not found`,
+                });
+              }
 
-                await queryRunner.manager.save(existingPart);
-              } else {
-                const part = queryRunner.manager.create(Part, {
-                  part_name: record['part_name*'],
-                  part_id: record['part_id*'],
-                  layer_id: record['layer_id*'],
-                  part_description: record['part_description'],
-                  purchase_url: record['purchase_url'],
-                  nsn_number: record['nsn_number'],
-                  nomenclature: record['nomenclature'],
-                  manufacturer_code: record['mfr_code'],
-                  quantity: record['quantity'] ? Number(record['quantity']) : 0,
-                  anaglyph: anaglyph,
+              for (const record of results) {
+                const existingPart = await queryRunner.manager.findOne(Part, {
+                  where: {
+                    layer_id: record['layer_id*'],
+                    anaglyph: anaglyph,
+                  },
                 });
 
-                await queryRunner.manager.save(part);
+                if (existingPart) {
+                  existingPart.part_name = record['part_name*'];
+                  existingPart.part_id = record['part_id*'];
+                  existingPart.part_description = record['part_description'];
+                  existingPart.purchase_url = record['purchase_url'];
+                  existingPart.nsn_number = record['nsn_number'];
+                  existingPart.nomenclature = record['nomenclature'];
+                  existingPart.manufacturer_code = record['mfr_code'];
+                  existingPart.quantity = record['quantity']
+                    ? Number(record['quantity'])
+                    : 0;
+
+                  await queryRunner.manager.save(existingPart);
+                } else {
+                  const part = queryRunner.manager.create(Part, {
+                    part_name: record['part_name*'],
+                    part_id: record['part_id*'],
+                    layer_id: record['layer_id*'],
+                    part_description: record['part_description'],
+                    purchase_url: record['purchase_url'],
+                    nsn_number: record['nsn_number'],
+                    nomenclature: record['nomenclature'],
+                    manufacturer_code: record['mfr_code'],
+                    quantity: record['quantity']
+                      ? Number(record['quantity'])
+                      : 0,
+                    anaglyph: anaglyph,
+                  });
+
+                  await queryRunner.manager.save(part);
+                }
               }
+
+              await queryRunner.commitTransaction();
+            } catch (error) {
+              await queryRunner.rollbackTransaction();
+              throw error;
+            } finally {
+              await queryRunner.release();
             }
-
-            await queryRunner.commitTransaction();
-          } catch (error) {
-            await queryRunner.rollbackTransaction();
-            throw error;
-          } finally {
-            await queryRunner.release();
-          }
-        });
-
-      return { message: 'File uploaded successfully', status: 200 };
+            resolve({ message: 'File uploaded successfully', status: 200 });
+          })
+          .on('error', (err) => reject(err));
+      });
     } catch (error) {
       console.error('Error during CSV upload', error);
       return { message: 'Error processing the file', status: 500 };

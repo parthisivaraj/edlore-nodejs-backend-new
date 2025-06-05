@@ -23,7 +23,7 @@ export class CustomUniqueService {
     if (otherWhere && otherWhere.model_id) {
       whereCondition.model_id = { id: otherWhere.model_id };
     }
-    
+
     try {
       const entity = await this.dataSource.manager.findOne(table, {
         where: whereCondition,

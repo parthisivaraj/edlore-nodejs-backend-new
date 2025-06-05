@@ -41,6 +41,8 @@ import { PermissionsModule } from './permission/permission.module';
 import { StepModule } from './step';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './response-interceptor.service';
+import { MailModule } from './mailer/mail.module';
+import { FeedbackModule } from './feedback';
 
 @Module({
   imports: [
@@ -51,7 +53,7 @@ import { ResponseInterceptor } from './response-interceptor.service';
     ScheduleModule.forRoot(),
     AppConfigModule,
     SchemaModule,
-    // MongoSchemaModule,
+    MailModule,
     HealthModule,
     OrganizationModule,
     AuthModule,
@@ -91,6 +93,7 @@ import { ResponseInterceptor } from './response-interceptor.service';
     SyncModule,
     StepModule,
     RealiseNoteModule,
+    FeedbackModule,
   ],
   controllers: [],
   providers: [

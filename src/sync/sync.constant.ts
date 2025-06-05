@@ -23,10 +23,10 @@ export const SYNC_TABLE_ORDERS = [
 ];
 
 export const GetSyncAPI = (ipAddress: string, last_sync_at: string) =>
-  `http://${ipAddress}:5100/api/v1/sync/pull?lastSyncAt=${last_sync_at}`;
+  `http://${ipAddress}/api/v1/sync/pull?lastSyncAt=${last_sync_at}`;
 
 export const PostSyncAPI = (ipAddress: string) =>
-  `http://${ipAddress}:5100/api/v1/sync/push`;
+  `http://${ipAddress}/api/v1/sync/push`;
 
 export const GetHealthAPI = (ipAddress: string) =>
-  `http://${ipAddress}:5100/api/v1/health`;
+  `http://${ipAddress}/api/v1/health`;

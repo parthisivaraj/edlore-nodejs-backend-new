@@ -1,0 +1,6 @@
+# pnpm v10 does not automatically run pacakge build scripts.
+# This file lets pnpm its ok to build bcrypt and nestjs.
+# Will not affect you if you're on v9, this is needed for CI tho
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - bcrypt

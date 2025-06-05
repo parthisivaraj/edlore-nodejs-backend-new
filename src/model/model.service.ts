@@ -119,17 +119,10 @@ export class ModelService {
 
     // Handle sorting
     if (params.sort_column && params.sort_order) {
-      if (['title', 'modelId'].includes(params.sort_column)) {
-        queryBuilder = queryBuilder.orderBy(
-          `LOWER(model.${params.sort_column})`,
-          params.sort_order,
-        );
-      } else {
-        queryBuilder = queryBuilder.orderBy(
-          `model.${params.sort_column}`,
-          params.sort_order,
-        );
-      }
+      queryBuilder = queryBuilder.orderBy(
+        `model.${params.sort_column}`,
+        params.sort_order,
+      );
     } else {
       queryBuilder = queryBuilder.orderBy('model.updated_at', 'DESC');
     }
