@@ -4,7 +4,7 @@ import {
   WorkOrderPriority,
   WorkOrderStatus,
 } from '@app/schema/model/work-order.entity';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsArray } from 'class-validator';
 
 interface AssignedTo {
   group: {
@@ -97,4 +97,65 @@ export class WorkOrderResponse {
   pagination: PaginationResponse;
   work_orders: WorkOrderResponseDto[];
   message: string;
+}
+
+export class CreateWorkOrderDto {
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  work_order_number: string;
+  
+  @IsNumber()
+  device_id: number;
+
+  @IsNumber()
+  status: number;
+}
+
+export class WorkOrderTodosAttribute {
+  @IsString()
+  taskable_id: string;
+
+  @IsString()
+  taskable_type: string;
+}
+
+export class UpdateWorkOrderDto {
+  @IsString()
+  @IsNotEmpty()
+  due_date: string;
+
+  repeat:boolean;
+
+  @IsNumber()
+  status: number;
+
+  @IsString()
+  task_type_id: string;
+
+  @IsArray()
+  @IsOptional()
+  work_order_todos_attributes: WorkOrderTodosAttribute[];
+
+  @IsString()
+  @IsOptional()
+  assigned_to_id: string;
+
+  @IsString()
+  @IsOptional()
+  assigned_to_type: string;
+
+  @IsString()
+  @IsOptional()
+  note: string;
+
+  @IsOptional()
+  priority: number;
+
+  @IsString()
+  @IsOptional()
+  role_id: string;
 }

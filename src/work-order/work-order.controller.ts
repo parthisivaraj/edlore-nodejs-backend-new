@@ -7,13 +7,36 @@ import {
   Put,
   NotFoundException,
   Query,
+  UploadedFiles,
+  UseInterceptors,
+  Request
 } from '@nestjs/common';
+// import {
+//   Body,
+//   Controller,
+//   Delete,
+//   Get,
+//   Param,
+//   Patch,
+//   Post,
+//   Query,
+//   Req,
+//   Request,
+//   UploadedFiles,
+//   UseGuards,
+//   UseInterceptors,
+// } from '@nestjs/common';
 import { WorkOrderService } from './work-order.service';
 import { ApiTags } from '@nestjs/swagger';
 import { SearchParamsDTO } from '@app/schema/dto';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
-@Controller('work-orders')
-@ApiTags('work-orders')
+import {
+  CreateWorkOrderDto, UpdateWorkOrderDto
+} from './dto/work-order';
+
+@Controller('work_order')
+@ApiTags('work_order')
 export class WorkOrderController {
   constructor(private readonly workOrderService: WorkOrderService) {}
 
@@ -30,4 +53,14 @@ export class WorkOrderController {
     }
     return workOrder;
   }
+
+  @Post('')
+  async create(@Body() data: CreateWorkOrderDto, @Request() req) {
+    return await this.workOrderService.create(data, req.user);
+  }
+
+  @Put(':id')
+    async update(@Param('id') id: string, @Body() data: UpdateWorkOrderDto) {
+      return await this.workOrderService.update(id, data);
+    }
 }

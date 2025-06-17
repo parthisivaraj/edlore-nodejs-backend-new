@@ -32,7 +32,7 @@ export class Troubleshoot extends BaseEntity {
   )
   errorCodeLinkings: ErrorCodeLinking[];
 
-  @OneToMany(() => WorkOrderTodo, (workOrderTodo) => workOrderTodo.taskable, {
+  @OneToMany(() => WorkOrderTodo, (workOrderTodo) => workOrderTodo.taskable_id, {
     cascade: true,
     onDelete: 'CASCADE',
   })

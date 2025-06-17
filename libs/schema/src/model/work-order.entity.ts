@@ -31,11 +31,9 @@ export enum WorkOrderPriority {
   high,
   urgent,
 }
+
 @Entity('work_orders')
 export class WorkOrder extends BaseEntity {
-  @Column({ length: 150, unique: true })
-  work_order_number: string;
-
   @Column({ length: 255 })
   title: string;
 
@@ -53,21 +51,42 @@ export class WorkOrder extends BaseEntity {
   })
   priority: WorkOrderPriority;
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'created_user_id' })
-  created_user: User;
+  @Column({ nullable: true })
+  note: string;
+
+  @Column({ length: 150, unique: true })
+  work_order_number: string;
+
+  @Column()
+  device_id: number;
 
   @ManyToOne(() => Device, { nullable: true })
   @JoinColumn({ name: 'device_id' })
   device: Device;
 
-  // @ManyToOne(() => Device, (device) => device.workOrders, { eager: true })
-  // @JoinColumn({ name: 'device_id' })
-  // device_id: Device;
+  @Column()
+  task_type_id: number;
 
   @ManyToOne(() => TaskType, { nullable: true })
   @JoinColumn({ name: 'task_type_id' })
   task_type: TaskType;
+
+  @Column()
+  created_user_id: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'created_user_id' })
+  created_user: User;
+
+  @Column({ nullable: true })
+  assigned_to_type: string;
+
+  @Column()
+  assigned_to_id: string;
+
+  @ManyToOne(() => User, (user) => user.workOrders, { nullable: true })
+  @JoinColumn({ name: 'assigned_to_id' })
+  assigned_to: User;
 
   @OneToMany(() => Repetition, (repetition) => repetition.work_order, {
     cascade: true,
@@ -89,30 +108,13 @@ export class WorkOrder extends BaseEntity {
   @OneToMany(() => Job, (job) => job.work_order, { cascade: true })
   jobs: Job[];
 
-  // @ManyToOne(() => User, (user) => user.workOrders)
-  // assigned_to: User;
-
-  @ManyToOne(() => User, (user) => user.workOrders, { nullable: true })
-  @JoinColumn({ name: 'assigned_to_id' })
-  assigned_to: User;
-
-  // @OneToMany(() => Repetition, (repetition) => repetition.work_order, {
-  //   cascade: true,
-  // })
-  // repetition: Repetition[];
-
-  @Column({ nullable: true })
-  note: string;
-
-  @Column({ nullable: true })
-  assigned_to_type: string;
-
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
   repeat: boolean;
-  work_order_status: any; //TODO REMOVE ANY
-  completed_task: null;
+  published_at: Date;
+  is_deleted: boolean;
+  updated_at: Date;
+  cancelled_at: Date;
 }

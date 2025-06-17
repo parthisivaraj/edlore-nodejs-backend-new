@@ -81,13 +81,25 @@ export class CategoriesService {
     return categoryDtos;
   }
 
-  async getAll(): Promise<CategoryResponseDto[]> {
+  // async getAll(): Promise<CategoryResponseDto[]> {
+  //   const categories = await this.categoryRepository
+  //     .createQueryBuilder('category')
+  //     .andWhere({ is_deleted: false })
+  //     .getMany();
+
+  //   return await this.convertToBaseDTO(categories);
+  // }
+
+  async getAll(): Promise<CategoryResponse> {
     const categories = await this.categoryRepository
       .createQueryBuilder('category')
       .andWhere({ is_deleted: false })
       .getMany();
 
-    return await this.convertToBaseDTO(categories);
+      return {
+        'message': 'Success',
+        categories: this.convertToBaseDTO(categories),
+      };
   }
 
   private async convertDeviceDTO(device: Device): Promise<TabDeviceDto> {

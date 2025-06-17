@@ -41,7 +41,7 @@ export class ErrorCode extends BaseEntity {
   })
   assetNotes: AssetNote[];
 
-  @OneToMany(() => WorkOrderTodo, (todo) => todo.taskable, { cascade: true })
+  @OneToMany(() => WorkOrderTodo, (todo) => todo.taskable_id, { cascade: true })
   workOrderTodos: WorkOrderTodo[];
 
   @OneToMany(

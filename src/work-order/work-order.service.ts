@@ -2,20 +2,32 @@
 
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Not, QueryRunner, Repository } from 'typeorm';
 import {
   WorkOrder,
   WorkOrderPriority,
   WorkOrderStatus,
 } from '@app/schema/model/work-order.entity';
-import { WorkOrderResponseDto, WorkOrderResponse } from './dto/work-order';
-import { SearchParamsDTO } from '@app/schema/dto';
+import { WorkOrderResponseDto, WorkOrderResponse, CreateWorkOrderDto, UpdateWorkOrderDto, WorkOrderTodosAttribute } from './dto/work-order';
+import { JwtUserPayload, SearchParamsDTO } from '@app/schema/dto';
+import { WorkOrderTodo } from '@app/schema';
+import { Procedure } from '@app/schema/model/procedure.entity';
+import { Troubleshoot } from '@app/schema/model/troubleshoot.entity';
+import { ErrorCode } from '@app/schema/model/error-code.entity';
 
 @Injectable()
-export class WorkOrderService {
+export class WorkOrderService { 
   constructor(
     @InjectRepository(WorkOrder)
     private readonly workOrderRepository: Repository<WorkOrder>,
+    @InjectRepository(Procedure)
+    private readonly procedureRepository: Repository<Procedure>,
+    @InjectRepository(Troubleshoot)
+    private readonly troubleshootRepository: Repository<Troubleshoot>,
+    @InjectRepository(ErrorCode)
+    private readonly errorCodeRepository: Repository<ErrorCode>,
+
+    private dataSource: DataSource,
   ) {}
 
   async get(params: SearchParamsDTO): Promise<WorkOrderResponse> {
@@ -92,7 +104,12 @@ export class WorkOrderService {
     return this.toResponse(workOrder);
   }
 
-  private toResponse(workOrder: WorkOrder): WorkOrderResponseDto {
+  private toResponse(workOrder: WorkOrder): any {
+    // return {
+    //   id: workOrder.id,
+    //   work_order_number: workOrder.work_order_number,
+    //   title: workOrder.title,
+    // }
     return {
       id: workOrder.id,
       work_order_number: workOrder.work_order_number,
@@ -104,8 +121,8 @@ export class WorkOrderService {
       assigned_to: workOrder.assigned_to
         ? {
             group: {
-              id: workOrder.assigned_to.user_groups[0].group.id,
-              title: workOrder.assigned_to.user_groups[0].group.title,
+              id: (workOrder.assigned_to.user_groups && workOrder.assigned_to.user_groups.length!=0) ? workOrder.assigned_to.user_groups[0]?.group.id:workOrder.assigned_to_id,
+              title: (workOrder.assigned_to.user_groups && workOrder.assigned_to.user_groups.length!=0) ? workOrder.assigned_to.user_groups[0]?.group.title:workOrder.assigned_to_type,
             },
           }
         : null,
@@ -154,9 +171,132 @@ export class WorkOrderService {
             beforeInsert: workOrder.task_type.beforeInsert,
           }
         : null,
-      work_order_status: workOrder.work_order_status,
+      // work_order_status: workOrder.work_order_status,
       note: workOrder.note,
-      completed_task: workOrder.completed_task || null,
+      // completed_task: workOrder.completed_task || null,
     };
   }
+
+  async create(data: CreateWorkOrderDto, user: JwtUserPayload): Promise<any> {
+  
+      const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+  
+      try {
+        const work_order = queryRunner.manager.create(WorkOrder, {
+          title: data.title,
+          device_id: data.device_id,
+          work_order_number: data.work_order_number,
+          status: data.status,
+          priority: 1,
+          created_user_id: user.id,
+        });
+        await queryRunner.manager.save(work_order);
+
+        // Commit the transaction
+        await queryRunner.commitTransaction();
+  
+        const workOrder = await this.workOrderRepository.findOne({
+          where: {
+            id: work_order.id,
+          },
+          relations: ['device', 'assigned_to'],
+        });
+    
+        if (!workOrder) {
+          throw new NotFoundException('Work order not found');
+        }
+        
+        return {
+          work_order: workOrder,
+          message: 'Success'
+        };
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+      } finally {
+        // Release the query runner when done
+        await queryRunner.release();
+      }
+  }
+
+  async resolveTaskable(taskable_type: string, taskable_id: string) {
+    // taskable_id: Procedure | Troubleshoot | ErrorCode
+    const repo = {
+      'Procedure': this.procedureRepository,
+      'Troubleshoot': this.troubleshootRepository,
+      'ErrorCode': this.errorCodeRepository,
+    }[taskable_type];
+  
+    return repo.findOneBy({ id: taskable_id });
+  }
+
+  private async saveWorkOrderTodos(
+      queryRunner: QueryRunner,
+      work_order_todos_attributes: WorkOrderTodosAttribute[],
+      work_order_id: string,
+    ) {
+      for (const work_order_todo_obj of work_order_todos_attributes) {
+          // Update or add new todo
+          const taskableEntity = await this.resolveTaskable(work_order_todo_obj.taskable_type, work_order_todo_obj.taskable_id);
+          const taskable_id = taskableEntity.id;
+          const wo_to_do = queryRunner.manager.create(WorkOrderTodo, {
+            work_order: { id: work_order_id },
+            taskable_type: work_order_todo_obj.taskable_type,
+            taskable_id: taskable_id, //work_order_todo_obj.taskable_id,
+            created_at: new Date(),
+            updated_at: new Date(),
+          });
+  
+          await queryRunner.manager.save(WorkOrderTodo, wo_to_do);
+      }
+    }
+
+  async update(id: string, data: UpdateWorkOrderDto) {
+      const workOrder = await this.workOrderRepository.findOne({
+        where: { id, is_deleted: false },
+      });
+  
+      if (!workOrder) {
+        throw new NotFoundException(`Work Order with id ${id} not found`);
+      }
+  
+      const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+  
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+  
+      try {
+        Object.assign(workOrder, {
+          repeat: data.repeat,
+          status: data.status,
+          task_type_id: data.task_type_id,
+          assigned_to_id: data.assigned_to_id,
+          assigned_to_type: data.assigned_to_type,
+          note: data.note,
+          priority: data.priority,
+          role_id: data.role_id,
+        });
+        await queryRunner.manager.save(WorkOrder, workOrder);
+  
+        if ((data.work_order_todos_attributes || []).length > 0) {
+          await this.saveWorkOrderTodos(
+            queryRunner,
+            data.work_order_todos_attributes,
+            workOrder.id,
+          );
+        }
+  
+        await queryRunner.commitTransaction();
+  
+        return this.getById(workOrder.id);
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+      } finally {
+        // Release the query runner when done
+        await queryRunner.release();
+      }
+    }
 }
