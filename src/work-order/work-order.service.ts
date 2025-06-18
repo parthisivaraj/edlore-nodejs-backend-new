@@ -8,9 +8,10 @@ import {
   WorkOrderPriority,
   WorkOrderStatus,
 } from '@app/schema/model/work-order.entity';
+import { ModelResponseDto } from 'src/model/dto/model';
 import { WorkOrderResponseDto, WorkOrderResponse, CreateWorkOrderDto, UpdateWorkOrderDto, WorkOrderTodosAttribute } from './dto/work-order';
 import { JwtUserPayload, SearchParamsDTO } from '@app/schema/dto';
-import { WorkOrderTodo } from '@app/schema';
+import { WorkOrderTodo, Model, WhichCategory} from '@app/schema';
 import { Procedure } from '@app/schema/model/procedure.entity';
 import { Troubleshoot } from '@app/schema/model/troubleshoot.entity';
 import { ErrorCode } from '@app/schema/model/error-code.entity';
@@ -89,12 +90,24 @@ export class WorkOrderService {
   }
 
   async getById(id: string): Promise<WorkOrderResponseDto> {
+    // const workOrder = await this.workOrderRepository.findOne({
+    //   where: {
+    //     id: id,
+    //     is_deleted: false,
+    //   },
+    //   relations: ['device', 'assigned_to'],
+    // });
     const workOrder = await this.workOrderRepository.findOne({
       where: {
         id: id,
         is_deleted: false,
       },
-      relations: ['device', 'assigned_to'],
+      relations: [
+        'device',
+        'device.model_id',
+        'device.model_id.category_id',
+        'assigned_to',
+      ],
     });
 
     if (!workOrder) {
@@ -103,6 +116,33 @@ export class WorkOrderService {
 
     return this.toResponse(workOrder);
   }
+
+  private convertToModelDTO(model: Model) {
+      const response = new ModelResponseDto();
+      response.id = model.id;
+      response.model_id = model.model_id;
+      response.title = model.title;
+      response.which_category = WhichCategory[model.which_category];
+      response.primary_category =
+        model.which_category === WhichCategory.primary
+          ? {
+              id: model?.category_id?.id,
+              name: model?.category_id?.name,
+            }
+          : null; // Adjust as needed
+      response.secondary_category =
+        model.which_category === WhichCategory.secondary
+          ? {
+              id: model?.category_id?.id,
+              name: model?.category_id?.name,
+              super_category: {
+                id: model?.category_id?.parent_id?.id,
+                name: model?.category_id?.parent_id?.name,
+              },
+            }
+          : null; // Adjust as needed
+      return response;
+    }
 
   private toResponse(workOrder: WorkOrder): any {
     // return {
@@ -134,25 +174,28 @@ export class WorkOrderService {
             serial_number: workOrder.device.serial_number,
             status: workOrder.device.status,
             created_at: workOrder.device.created_at.toISOString(),
-            model: workOrder.device.model_id
-              ? {
-                  id: workOrder.device.model_id.id,
-                  model_id: workOrder.device.model_id.model_id,
-                  title: workOrder.device.model_id.title,
-                  which_category: workOrder.device.model_id.which_category,
-                  // primary_category: workOrder.device.model_id.primary_category,
-                  // secondary_category: workOrder.device.model_id
-                  //   .secondary_category
-                  //   ? {
-                  //       id: workOrder.device.model_id.secondary_category.id,
-                  //       name: workOrder.device.model_id.secondary_category.name,
-                  //       super_category:
-                  //         workOrder.device.model_id.secondary_category
-                  //           .super_category,
-                  //     }
-                  //   : null,
-                }
-              : null,
+            model: this.convertToModelDTO(workOrder.device.model_id),
+            // model: workOrder.device.model_id
+            //   ? {
+            //       id: workOrder.device.model_id.id,
+            //       model_id: workOrder.device.model_id.model_id,
+            //       title: workOrder.device.model_id.title,
+            //       which_category: WhichCategory[workOrder.device.model_id.which_category],
+            //       primary_category: (WhichCategory[workOrder.device.model_id.which_category] == 'primary') ? workOrder.device.model_id.category_id : null,
+            //       secondary_category: (WhichCategory[workOrder.device.model_id.which_category] == 'secondary') ? workOrder.device.model_id.category_id : null,
+            //       // primary_category: workOrder.device.model_id.primary_category,
+            //       // secondary_category: workOrder.device.model_id
+            //       //   .secondary_category
+            //       //   ? {
+            //       //       id: workOrder.device.model_id.secondary_category.id,
+            //       //       name: workOrder.device.model_id.secondary_category.name,
+            //       //       super_category:
+            //       //         workOrder.device.model_id.secondary_category
+            //       //           .super_category,
+            //       //     }
+            //       //   : null,
+            //     }
+            //   : null,
           } as any)
         : null,
       created_at: workOrder.created_at.toISOString(),
