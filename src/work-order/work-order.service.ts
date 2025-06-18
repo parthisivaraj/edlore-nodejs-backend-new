@@ -35,6 +35,7 @@ export class WorkOrderService {
     const queryBuilder = this.workOrderRepository
       .createQueryBuilder('work_order')
       .leftJoinAndSelect('work_order.device', 'device')
+      .leftJoinAndSelect('work_order.task_type', 'task_type')
       .leftJoinAndSelect('device.model_id', 'model_id')
       .leftJoinAndSelect('model_id.category_id', 'category_id')
       .leftJoinAndSelect('work_order.assigned_to', 'assigned_to')
@@ -105,6 +106,7 @@ export class WorkOrderService {
       },
       relations: [
         'device',
+        'task_type',
         'device.model_id',
         'device.model_id.category_id',
         'assigned_to',
@@ -215,7 +217,7 @@ export class WorkOrderService {
             beforeInsert: workOrder.task_type.beforeInsert,
           }
         : null,
-      // work_order_status: workOrder.work_order_status,
+      work_order_status: WorkOrderStatus[workOrder.status],
       note: workOrder.note,
       // completed_task: workOrder.completed_task || null,
     };
