@@ -35,9 +35,10 @@ export class WorkOrderService {
     const queryBuilder = this.workOrderRepository
       .createQueryBuilder('work_order')
       .leftJoinAndSelect('work_order.device', 'device')
+      .leftJoinAndSelect('device.model_id', 'model_id')
+      .leftJoinAndSelect('model_id.category_id', 'category_id')
       .leftJoinAndSelect('work_order.assigned_to', 'assigned_to')
       .where('work_order.is_deleted = :isDeleted', { isDeleted: false });
-
     // if (params.id) {
     //   queryBuilder.andWhere('work_order.id = :id', { id: params.id });
     // }
